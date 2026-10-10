@@ -1,0 +1,8 @@
+{
+  "name": "TOÁN 10 – Khám Phá Toán Học - Team AI GenZ ",
+  "description": "Thư viện học liệu số môn Toán lớp 10: Trò chơi toán học, App mô phỏng, Infographic, Sơ đồ tư duy và Trợ lý AI dành cho giáo viên và học sinh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

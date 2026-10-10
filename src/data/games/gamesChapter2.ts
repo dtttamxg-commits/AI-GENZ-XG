@@ -1,0 +1,932 @@
+import { LearningItem } from '../../types';
+
+export const htmlGiaiMaMienNghiem = `<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Giải Mã Miền Nghiệm - Toán 10</title>
+    <style>
+        :root {
+            --navy-dark: #0A192F;
+            --navy: #112240;
+            --navy-light: #233554;
+            --teal: #64FFDA;
+            --teal-dim: rgba(100, 255, 218, 0.1);
+            --gold: #FBBF24;
+            --gold-dim: rgba(251, 191, 36, 0.1);
+            --danger: #EF4444;
+            --danger-dim: rgba(239, 68, 68, 0.1);
+            --success: #10B981;
+            --success-dim: rgba(16, 185, 129, 0.1);
+            --text-main: #E2E8F0;
+            --text-muted: #94A3B8;
+            --bg-canvas: #0F172A;
+            --font-sans: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-serif: 'Times New Roman', Times, serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--navy-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overscroll-behavior: none;
+            line-height: 1.5;
+        }
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-teal { color: var(--teal); }
+        .text-gold { color: var(--gold); }
+        .text-danger { color: var(--danger); }
+        .text-success { color: var(--success); }
+        .font-bold { font-weight: bold; }
+        .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .w-full { width: 100%; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .math { font-family: var(--font-serif); font-size: 1.15em; font-style: italic; letter-spacing: 0.5px; }
+        .math-normal { font-family: var(--font-serif); font-size: 1.15em; font-style: normal; }
+        .container { max-width: 900px; margin: 0 auto; padding: 1rem; width: 100%; }
+        header { background-color: var(--navy); border-bottom: 1px solid var(--navy-light); padding: 1rem; position: sticky; top: 0; z-index: 10; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 0 auto; font-size: 0.9rem; }
+        .progress-container { max-width: 900px; margin: 0.5rem auto 0; background-color: var(--navy-light); height: 6px; border-radius: 3px; overflow: hidden; }
+        .progress-bar { background: linear-gradient(90deg, var(--teal), var(--gold)); height: 100%; width: 0%; transition: width 0.3s ease; }
+        main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 1rem; }
+        .card { background-color: var(--navy); border: 1px solid var(--navy-light); border-radius: 12px; padding: 2rem; width: 100%; max-width: 800px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        h1 { color: transparent; background: linear-gradient(90deg, var(--teal), var(--gold)); -webkit-background-clip: text; background-clip: text; font-size: 2rem; text-align: center; margin-bottom: 1rem; }
+        h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: #fff; line-height: 1.4; }
+        input[type="text"] {
+            width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--navy-light);
+            background-color: var(--navy-dark); color: #fff; font-size: 1rem; margin-bottom: 1.5rem; font-family: inherit;
+        }
+        input[type="text"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal-dim); }
+        .input-fill {
+            width: auto; min-width: 80px; text-align: center; border: none; border-bottom: 2px solid var(--text-muted);
+            background: transparent; color: var(--gold); font-size: 1.1rem; padding: 0.2rem 0.5rem; font-family: var(--font-serif);
+            border-radius: 0; margin: 0 0.2rem;
+        }
+        .input-fill:focus { outline: none; border-color: var(--teal); }
+        .btn { display: inline-block; padding: 0.8rem 1.5rem; border-radius: 8px; border: none; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-primary { background: linear-gradient(90deg, var(--teal), #34D399); color: var(--navy-dark); width: 100%; font-size: 1.1rem; padding: 1rem; box-shadow: 0 4px 15px var(--teal-dim); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-action { background-color: var(--teal); color: var(--navy-dark); padding: 0.7rem 1.5rem; }
+        .btn-action:hover { background-color: #34D399; }
+        .btn-next { background-color: var(--gold); color: var(--navy-dark); padding: 0.7rem 1.5rem; }
+        .btn-next:hover { background-color: #F59E0B; }
+        .btn-secondary { background-color: var(--navy-light); color: var(--text-main); }
+        .btn-secondary:hover { background-color: #334155; }
+        .mode-selector { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .mode-label { flex: 1; cursor: pointer; text-align: center; padding: 0.8rem; border: 1px solid var(--navy-light); border-radius: 8px; font-weight: bold; font-size: 0.9rem; transition: all 0.2s; }
+        .mode-radio:checked + .mode-label.mode-normal { border-color: var(--teal); background-color: var(--teal-dim); color: var(--teal); }
+        .mode-radio:checked + .mode-label.mode-timed { border-color: var(--gold); background-color: var(--gold-dim); color: var(--gold); }
+        .mode-radio { display: none; }
+        .mcq-option { display: flex; align-items: center; padding: 1rem; border: 1px solid var(--navy-light); border-radius: 8px; margin-bottom: 0.8rem; cursor: pointer; background-color: var(--navy-light); transition: all 0.2s; }
+        .mcq-option:hover { background-color: #2D4369; }
+        .mcq-radio:checked + .mcq-option { border-color: var(--teal); background-color: var(--teal-dim); }
+        .mcq-radio { display: none; }
+        .tf-container { display: flex; gap: 1rem; max-width: 400px; margin: 0 auto; }
+        .tf-option { flex: 1; text-align: center; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--navy-light); background-color: var(--navy-light); font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.2s;}
+        .tf-radio:checked + .tf-option.opt-true { border-color: var(--success); background-color: var(--success-dim); color: var(--success); }
+        .tf-radio:checked + .tf-option.opt-false { border-color: var(--danger); background-color: var(--danger-dim); color: var(--danger); }
+        .tf-radio { display: none; }
+        .dnd-pool { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; padding: 1rem; background-color: var(--navy-light); border-radius: 8px; min-height: 80px;}
+        .dnd-item { background: linear-gradient(145deg, #334155, #1E293B); padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid #475569; cursor: pointer; user-select: none; font-size: 0.95rem; font-weight: 500; transition: all 0.2s; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .dnd-item:active { transform: scale(0.95); }
+        .dnd-item.selected { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-dim); transform: translateY(-2px); background: linear-gradient(145deg, #475569, #334155); }
+        .dnd-targets { display: flex; flex-direction: column; gap: 1rem; }
+        .dnd-target-row { display: flex; flex-direction: column; background: var(--bg-canvas); padding: 0.8rem; border-radius: 8px; border: 1px dashed #475569; }
+        @media (min-width: 600px) { .dnd-target-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 1rem; } }
+        .dnd-target-label { font-size: 0.95rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--text-muted); flex: 1;}
+        .dnd-slot { width: 100%; min-height: 46px; border: 2px dashed #475569; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background-color: rgba(0,0,0,0.2); }
+        @media (min-width: 600px) { .dnd-slot { width: 50%; } }
+        .dnd-slot.active { border-color: var(--teal); background-color: var(--teal-dim); }
+        .dnd-group-container { display: flex; flex-direction: column; gap: 1rem; }
+        @media (min-width: 600px) { .dnd-group-container { flex-direction: row; } }
+        .dnd-group { flex: 1; background: var(--bg-canvas); padding: 1rem; border-radius: 8px; border: 1px dashed #475569; }
+        .dnd-group-title { text-align: center; font-weight: bold; margin-bottom: 1rem; color: var(--teal); border-bottom: 1px solid #475569; padding-bottom: 0.5rem;}
+        .dnd-slots-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;}
+        .dnd-slots-grid .dnd-slot { width: 45%; min-width: 80px; }
+        .dnd-sort-container { display: flex; flex-direction: column; gap: 0.5rem; }
+        .dnd-sort-row { display: flex; align-items: stretch; gap: 0.5rem; }
+        .dnd-sort-number { width: 30px; display: flex; align-items: center; justify-content: center; background: var(--navy-light); border-radius: 6px; font-weight: bold; color: var(--gold); }
+        .dnd-sort-container .dnd-slot { width: 100%; flex: 1; justify-content: flex-start; padding: 0 0.5rem; }
+        .feedback-box { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 0.95rem; border-left: 4px solid; display: none; }
+        .feedback-box.correct { background-color: var(--success-dim); border-color: var(--success); }
+        .feedback-box.incorrect { background-color: var(--danger-dim); border-color: var(--danger); }
+        .feedback-box.partial { background-color: var(--gold-dim); border-color: var(--gold); }
+        .feedback-title { font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .feedback-answer { color: #fff; margin-bottom: 0.5rem; font-style: italic; }
+        .feedback-exp { color: var(--text-muted); }
+        .graph-container { margin-top: 1rem; display: flex; justify-content: center; background-color: #fff; border-radius: 8px; padding: 10px; overflow: hidden; border: 2px solid var(--navy-light);}
+        .graph-container svg { max-width: 100%; height: auto; }
+        .summary-box { background-color: var(--navy-light); padding: 1.5rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem; }
+        .summary-score { font-size: 2.5rem; font-weight: bold; color: var(--teal); margin: 0.5rem 0; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .result-item { background: var(--navy-light); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid #475569;}
+        .result-val { font-size: 1.8rem; font-weight: bold; }
+        .review-list { max-height: 300px; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1.5rem; }
+        .review-item { background: var(--navy-light); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid var(--gold); font-size: 0.9rem;}
+        footer { text-align: center; padding: 1rem; font-size: 0.85rem; color: var(--text-muted); margin-top: auto; border-top: 1px solid var(--navy-light); background-color: var(--navy);}
+    </style>
+</head>
+<body>
+    <header id="game-header" class="hidden">
+        <div class="header-content">
+            <div class="flex items-center gap-2">
+                <span id="player-display" class="font-bold text-teal hidden sm:inline"></span>
+                <span id="stage-display" style="background: var(--navy-light); padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: bold; color: var(--gold);"></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="timer-display" class="font-bold text-teal hidden" style="font-family: monospace; font-size: 1.2rem;">--:--</span>
+                <span class="font-bold">Điểm: <span id="score-display" class="text-gold" style="font-size: 1.2rem;">0</span></span>
+            </div>
+        </div>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="text-center" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+            Câu <span id="q-num-display">1</span>/20
+        </div>
+    </header>
+
+    <main>
+        <div id="screen-start" class="card fade-in text-center">
+            <h1>GIẢI MÃ MIỀN NGHIỆM</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Thử thách 20 câu hỏi khám phá kiến thức Bất phương trình bậc nhất hai ẩn - Toán 10. Hãy chọn điểm thử, xác định đường biên và tìm ra vùng sáng chân lý!</p>
+            <div style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--text-muted);">Tên người chơi / Đội</label>
+                <input type="text" id="input-name" placeholder="Nhập tên của bạn...">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--text-muted);">Thời gian suy nghĩ</label>
+                <div class="mode-selector">
+                    <input type="radio" name="mode" id="mode-normal" value="normal" class="mode-radio" checked>
+                    <label for="mode-normal" class="mode-label mode-normal">Không giới hạn</label>
+                    <input type="radio" name="mode" id="mode-timed" value="timed" class="mode-radio">
+                    <label for="mode-timed" class="mode-label mode-timed">60s / Câu</label>
+                </div>
+                <button id="btn-start" class="btn btn-primary mt-4">BẮT ĐẦU NGAY</button>
+            </div>
+        </div>
+
+        <div id="screen-game" class="card hidden fade-in" style="padding: 1.5rem;">
+            <h2 id="question-text"></h2>
+            <div id="answer-area"></div>
+            <div id="feedback-area" class="feedback-box">
+                <div id="fb-title" class="feedback-title"></div>
+                <div id="fb-ans" class="feedback-answer"></div>
+                <div id="fb-exp" class="feedback-exp"></div>
+                <div id="fb-graph"></div>
+            </div>
+            <div class="flex justify-between mt-4" style="border-top: 1px solid var(--navy-light); padding-top: 1rem;">
+                <button id="btn-reset-dnd" class="btn btn-secondary hidden">Xếp lại</button>
+                <div style="flex-grow: 1;"></div>
+                <button id="btn-check" class="btn btn-action">Kiểm tra</button>
+                <button id="btn-next" class="btn btn-next hidden">Câu tiếp theo</button>
+            </div>
+        </div>
+
+        <div id="screen-stage" class="card hidden fade-in text-center">
+            <h2 style="color: var(--teal); font-size: 1.5rem; margin-bottom: 0.5rem;">Hoàn thành chặng!</h2>
+            <div id="stage-name-summary" style="font-size: 1.2rem; font-weight: bold; color: var(--gold); margin-bottom: 1.5rem;"></div>
+            <div class="summary-box">
+                <div style="color: var(--text-muted);">Điểm chặng này</div>
+                <div id="stage-score-summary" class="summary-score">50/50</div>
+            </div>
+            <button id="btn-next-stage" class="btn btn-primary" style="max-width: 300px;">Tiếp tục hành trình</button>
+        </div>
+
+        <div id="screen-final" class="card hidden fade-in">
+            <h1 style="margin-bottom: 0.2rem;">GIẢI MÃ THÀNH CÔNG!</h1>
+            <div id="final-name" class="text-center font-bold text-teal mb-4" style="font-size: 1.2rem;"></div>
+            <div class="result-grid">
+                <div class="result-item">
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">Tổng điểm</div>
+                    <div id="final-score" class="result-val text-gold"></div>
+                </div>
+                <div class="result-item">
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">Số câu trọn vẹn</div>
+                    <div id="final-perfect" class="result-val text-teal"></div>
+                </div>
+            </div>
+            <div style="background: var(--navy-dark); padding: 1rem; border-radius: 8px; border: 1px solid var(--navy-light); margin-bottom: 1.5rem;">
+                <div style="font-weight: bold; margin-bottom: 0.5rem; border-bottom: 1px solid #475569; padding-bottom: 0.5rem;">Điểm từng chặng:</div>
+                <div id="final-stages-breakdown" style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.3rem;"></div>
+            </div>
+            <div id="final-advice" class="text-center font-bold" style="margin-bottom: 1.5rem; color: #fff;"></div>
+            <div id="review-container" class="hidden">
+                <div class="text-danger font-bold mb-4" style="border-bottom: 1px solid var(--danger); padding-bottom: 0.5rem;">Các câu cần xem lại:</div>
+                <div id="review-list" class="review-list"></div>
+            </div>
+            <div class="flex flex-col gap-4 items-center sm:flex-row sm:justify-center mt-4">
+                <button id="btn-review" class="btn btn-secondary hidden">Ôn câu cần xem lại</button>
+                <button id="btn-restart" class="btn btn-action" style="padding: 0.8rem 2rem;">Chơi lại từ đầu</button>
+            </div>
+        </div>
+    </main>
+
+    <footer><p>Học Toán cùng Eliza Tâm Dương</p></footer>
+
+    <script>
+        const STAGES = ["Nhận diện thử thách", "Thám tử tọa độ", "Ghép mảnh miền nghiệm", "Mở khóa ứng dụng"];
+        const QUESTION_BANK = [
+            {
+                id: 1, stage: 0, type: "mcq",
+                q: "Bất phương trình nào là bất phương trình bậc nhất hai ẩn?",
+                opts: ["<span class='math'>x² + y ≤ 3</span>.", "<span class='math'>2x − 3y > 5</span>.", "<span class='math'>xy + x < 4</span>.", "<span class='math'>x + y² ≥ 2</span>."],
+                ans: "<span class='math'>2x − 3y > 5</span>.",
+                exp: "Hai ẩn đều có bậc nhất và các hệ số của x, y không đồng thời bằng 0."
+            },
+            {
+                id: 2, stage: 0, type: "mcq",
+                q: "Cặp số nào là nghiệm của <span class='math'>x + 2y ≤ 4</span>?",
+                opts: ["<span class='math'>(2; 2)</span>.", "<span class='math'>(5; 0)</span>.", "<span class='math'>(1; 1)</span>.", "<span class='math'>(0; 3)</span>."],
+                ans: "<span class='math'>(1; 1)</span>.",
+                exp: "Thay (1; 1) được 1 + 2·1 = 3 ≤ 4. Ba cặp còn lại đều cho vế trái lớn hơn 4."
+            },
+            {
+                id: 3, stage: 0, type: "mcq",
+                q: "Đường thẳng biên của <span class='math'>2x − y > 3</span> có phương trình:",
+                opts: ["<span class='math'>2x − y = 3</span>.", "<span class='math'>2x + y = 3</span>.", "<span class='math'>2x − y = 0</span>.", "<span class='math'>x − 2y = 3</span>."],
+                ans: "<span class='math'>2x − y = 3</span>.",
+                exp: "Thay dấu bất đẳng thức bằng dấu bằng để xác định đường thẳng biên."
+            },
+            {
+                id: 4, stage: 0, type: "mcq", graphReq: "q4",
+                q: "Miền nghiệm của <span class='math'>y ≥ 2x − 1</span> là:",
+                opts: [
+                    "Nửa mặt phẳng phía dưới đường thẳng y = 2x − 1, có chứa bờ.",
+                    "Nửa mặt phẳng phía trên đường thẳng y = 2x − 1, không chứa bờ.",
+                    "Nửa mặt phẳng phía dưới đường thẳng y = 2x − 1, không chứa bờ.",
+                    "Nửa mặt phẳng phía trên đường thẳng y = 2x − 1, có chứa bờ."
+                ],
+                ans: "Nửa mặt phẳng phía trên đường thẳng y = 2x − 1, có chứa bờ.",
+                exp: "Với mỗi x, y phải lớn hơn hoặc bằng tung độ trên đường thẳng; dấu ≥ giữ cả đường thẳng biên."
+            },
+            {
+                id: 5, stage: 0, type: "mcq", graphReq: "q5",
+                q: "Đường thẳng x + y = 2 chia mặt phẳng thành hai nửa mặt phẳng. Miền nghiệm của x + y < 2 là:",
+                opts: [
+                    "Nửa mặt phẳng không chứa O(0; 0), không chứa bờ.",
+                    "Nửa mặt phẳng chứa O(0; 0), không chứa bờ.",
+                    "Nửa mặt phẳng chứa O(0; 0), có chứa bờ.",
+                    "Chỉ đường thẳng x + y = 2."
+                ],
+                ans: "Nửa mặt phẳng chứa O(0; 0), không chứa bờ.",
+                exp: "O không thuộc đường thẳng biên và 0 + 0 < 2 đúng. Dấu < loại đường thẳng biên."
+            },
+            {
+                id: 6, stage: 1, type: "tf",
+                q: "“Cặp số (2; 1) là nghiệm của x + y ≤ 3.”",
+                ans: "Đúng", exp: "2 + 1 = 3 ≤ 3; điểm nằm trên đường thẳng biên vẫn được nhận."
+            },
+            {
+                id: 7, stage: 1, type: "tf",
+                q: "“Cặp số (2; 1) là nghiệm của x + y < 3.”",
+                ans: "Sai", exp: "2 + 1 = 3, không nhỏ hơn 3."
+            },
+            {
+                id: 8, stage: 1, type: "tf", graphReq: "q8",
+                q: "“Khi biểu diễn miền nghiệm của x − y ≥ 1, đường thẳng biên được vẽ nét liền.”",
+                ans: "Đúng", exp: "Dấu ≥ cho phép các điểm trên đường thẳng biên thuộc miền nghiệm."
+            },
+            {
+                id: 9, stage: 1, type: "tf", graphReq: "q9",
+                q: "“Có thể dùng O(0; 0) làm điểm thử để xác định phía cần tô của bất phương trình x − y > 0.”",
+                ans: "Sai", exp: "O nằm trên đường thẳng x − y = 0 nên không phân biệt được hai phía. Có thể dùng (1; 0) làm điểm thử."
+            },
+            {
+                id: 10, stage: 1, type: "tf", graphReq: "q10",
+                q: "“Miền nghiệm của x < 2 là nửa mặt phẳng phía bên trái đường thẳng x = 2, không chứa đường thẳng đó.”",
+                ans: "Đúng", exp: "Các điểm có hoành độ nhỏ hơn 2 nằm bên trái đường thẳng đứng x = 2."
+            },
+            {
+                id: 11, stage: 2, type: "dnd", layout: "list",
+                q: "Ghép bất phương trình với đường thẳng biên.",
+                targets: ["<span class='math'>x + y ≤ 4</span>", "<span class='math'>2x − y > 1</span>", "<span class='math'>y ≥ −2</span>", "<span class='math'>x < 3</span>"],
+                items: ["<span class='math'>x + y = 4</span>", "<span class='math'>2x − y = 1</span>", "<span class='math'>y = −2</span>", "<span class='math'>x = 3</span>"],
+                pairs: {
+                    "<span class='math'>x + y ≤ 4</span>": "<span class='math'>x + y = 4</span>",
+                    "<span class='math'>2x − y > 1</span>": "<span class='math'>2x − y = 1</span>",
+                    "<span class='math'>y ≥ −2</span>": "<span class='math'>y = −2</span>",
+                    "<span class='math'>x < 3</span>": "<span class='math'>x = 3</span>"
+                },
+                exp: "Đường thẳng biên thu được khi thay dấu bất đẳng thức bằng dấu bằng."
+            },
+            {
+                id: 12, stage: 2, type: "dnd", layout: "list", eqMatters: true,
+                q: "Ghép bất phương trình với quy tắc vẽ đường thẳng biên.",
+                targets: ["<span class='math'>x + y ≤ 2</span>", "<span class='math'>x − y ≥ 1</span>", "<span class='math'>x + y < 2</span>", "<span class='math'>x − y > 1</span>"],
+                items: ["Nét liền, chứa bờ", "Nét liền, chứa bờ", "Nét đứt, không chứa bờ", "Nét đứt, không chứa bờ"],
+                pairs: {
+                    "<span class='math'>x + y ≤ 2</span>": "Nét liền, chứa bờ",
+                    "<span class='math'>x − y ≥ 1</span>": "Nét liền, chứa bờ",
+                    "<span class='math'>x + y < 2</span>": "Nét đứt, không chứa bờ",
+                    "<span class='math'>x − y > 1</span>": "Nét đứt, không chứa bờ"
+                },
+                exp: "≤, ≥ giữ bờ; <, > loại bờ."
+            },
+            {
+                id: 13, stage: 2, type: "dnd-group",
+                q: "Với bất phương trình <span class='math'>x + y ≤ 3</span>, kéo các điểm vào nhóm phù hợp.",
+                targets: ["Thuộc miền nghiệm", "Không thuộc miền nghiệm"],
+                slotsPerGroup: 2,
+                items: ["<span class='math'>A(0; 0)</span>", "<span class='math'>B(1; 2)</span>", "<span class='math'>C(2; 2)</span>", "<span class='math'>D(4; 0)</span>"],
+                correctGroups: {
+                    "Thuộc miền nghiệm": ["<span class='math'>A(0; 0)</span>", "<span class='math'>B(1; 2)</span>"],
+                    "Không thuộc miền nghiệm": ["<span class='math'>C(2; 2)</span>", "<span class='math'>D(4; 0)</span>"]
+                },
+                exp: "Tổng tọa độ của A, B lần lượt là 0, 3; của C, D đều là 4."
+            },
+            {
+                id: 14, stage: 2, type: "dnd", layout: "sort", graphReq: "q14",
+                q: "Sắp xếp các bước biểu diễn miền nghiệm của <span class='math'>x + y < 2</span>.",
+                targets: ["Bước 1", "Bước 2", "Bước 3", "Bước 4"],
+                items: [
+                    "Vẽ đường thẳng biên x + y = 2 bằng nét đứt.",
+                    "Chọn điểm thử O(0; 0) không nằm trên đường thẳng biên.",
+                    "Thay tọa độ O vào bất phương trình: 0 + 0 < 2 đúng.",
+                    "Tô nửa mặt phẳng chứa O và không lấy đường thẳng biên."
+                ],
+                pairs: {
+                    "Bước 1": "Vẽ đường thẳng biên x + y = 2 bằng nét đứt.",
+                    "Bước 2": "Chọn điểm thử O(0; 0) không nằm trên đường thẳng biên.",
+                    "Bước 3": "Thay tọa độ O vào bất phương trình: 0 + 0 < 2 đúng.",
+                    "Bước 4": "Tô nửa mặt phẳng chứa O và không lấy đường thẳng biên."
+                },
+                exp: "Điểm thử xác định phía cần tô; dấu < quyết định không lấy bờ."
+            },
+            {
+                id: 15, stage: 2, type: "dnd", layout: "list", graphReq: "q15",
+                q: "Ghép bất phương trình với mô tả miền nghiệm.",
+                targets: ["<span class='math'>y > 1</span>", "<span class='math'>y ≤ −1</span>", "<span class='math'>x ≥ 2</span>", "<span class='math'>x < −2</span>"],
+                items: ["Phía trên y = 1, không chứa bờ.", "Phía dưới y = −1, có chứa bờ.", "Phía bên phải x = 2, có chứa bờ.", "Phía bên trái x = −2, không chứa bờ."],
+                pairs: {
+                    "<span class='math'>y > 1</span>": "Phía trên y = 1, không chứa bờ.",
+                    "<span class='math'>y ≤ −1</span>": "Phía dưới y = −1, có chứa bờ.",
+                    "<span class='math'>x ≥ 2</span>": "Phía bên phải x = 2, có chứa bờ.",
+                    "<span class='math'>x < −2</span>": "Phía bên trái x = −2, không chứa bờ."
+                },
+                exp: "Bất phương trình chỉ có y cho miền phía trên/dưới; chỉ có x cho miền bên phải/trái."
+            },
+            {
+                id: 16, stage: 3, type: "fill",
+                q: "Cho điểm M(1; 2). Khi thay tọa độ M vào biểu thức 2x + y, ta được giá trị [INPUT].",
+                ansNorms: ["4", "4.0"], dispAns: "4",
+                exp: "2·1 + 2 = 4; vì thế M là nghiệm của 2x + y ≤ 5."
+            },
+            {
+                id: 17, stage: 3, type: "fill",
+                q: "Đường thẳng biên của 3x + 2y ≤ 6 cắt trục hoành tại A([INPUT]; 0).",
+                ansNorms: ["2", "2.0"], dispAns: "2",
+                exp: "Cho y = 0, ta có 3x = 6 nên x = 2."
+            },
+            {
+                id: 18, stage: 3, type: "fill",
+                q: "Khi thử O(0; 0) trong x + y > 2, ta được khẳng định sai. Vì vậy cần tô nửa mặt phẳng [INPUT] O.",
+                ansNorms: ["khongchua", "khongco"], dispAns: "không chứa",
+                exp: "O không nằm trên đường thẳng biên và không thỏa mãn bất phương trình nên chọn phía đối diện O; không lấy bờ."
+            },
+            {
+                id: 19, stage: 3, type: "fill", graphReq: "q19",
+                q: "Bất phương trình 2x + y ≤ 4 tương đương với y [INPUT] 4 − 2x.",
+                ansNorms: ["<=", "≤", "nhohonhoacbang", "behonhoacbang"], dispAns: "≤",
+                exp: "Trừ 2x ở cả hai vế, dấu bất đẳng thức giữ nguyên."
+            },
+            {
+                id: 20, stage: 3, type: "fill",
+                q: "Một nhóm mua x quyển vở, mỗi quyển 10 nghìn đồng, và y chiếc bút, mỗi chiếc 5 nghìn đồng. Ngân sách không quá 100 nghìn đồng. Điều kiện ngân sách là 10x + 5y [INPUT] 100.",
+                ansNorms: ["<=", "≤", "nhohonhoacbang", "behonhoacbang"], dispAns: "≤",
+                exp: "“Không quá” nghĩa là nhỏ hơn hoặc bằng. Trong tình huống này, x và y là các số nguyên không âm."
+            }
+        ];
+
+        let state = {
+            qIdx: 0, score: 0, stageScores: [0,0,0,0], perfects: 0,
+            timer: null, timeRem: 0, isTimed: false, locked: false,
+            mistakes: [], isReview: false, revList: [], revIdx: 0, name: "Ẩn danh"
+        };
+        let dndState = { selected: null };
+
+        const DOM = {
+            start: document.getElementById('screen-start'),
+            game: document.getElementById('screen-game'),
+            stage: document.getElementById('screen-stage'),
+            final: document.getElementById('screen-final'),
+            header: document.getElementById('game-header'),
+            nameIn: document.getElementById('input-name'),
+            qText: document.getElementById('question-text'),
+            ansArea: document.getElementById('answer-area'),
+            fb: document.getElementById('feedback-area'),
+            fbTitle: document.getElementById('fb-title'),
+            fbAns: document.getElementById('fb-ans'),
+            fbExp: document.getElementById('fb-exp'),
+            fbGraph: document.getElementById('fb-graph'),
+            btnStart: document.getElementById('btn-start'),
+            btnCheck: document.getElementById('btn-check'),
+            btnNext: document.getElementById('btn-next'),
+            btnNextStage: document.getElementById('btn-next-stage'),
+            btnReset: document.getElementById('btn-reset-dnd'),
+            btnReview: document.getElementById('btn-review'),
+            btnRestart: document.getElementById('btn-restart'),
+            displays: {
+                name: document.getElementById('player-display'),
+                stage: document.getElementById('stage-display'),
+                timer: document.getElementById('timer-display'),
+                score: document.getElementById('score-display'),
+                prog: document.getElementById('progress-bar'),
+                qNum: document.getElementById('q-num-display')
+            }
+        };
+
+        const utils = {
+            hideAll: () => { [DOM.start, DOM.game, DOM.stage, DOM.final].forEach(el => el.classList.add('hidden')); },
+            shuffle: (arr) => {
+                let a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            },
+            normStr: (s) => s.trim().toLowerCase().replace(/\\s+/g, '').normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/,/g, '.')
+        };
+
+        DOM.btnStart.addEventListener('click', () => {
+            let n = DOM.nameIn.value.trim();
+            if(n) state.name = n;
+            state.isTimed = document.getElementById('mode-timed').checked;
+            resetState(); startPlay();
+        });
+
+        DOM.btnRestart.addEventListener('click', () => { resetState(); startPlay(); });
+
+        function resetState() {
+            state.qIdx = 0; state.score = 0; state.stageScores = [0,0,0,0]; state.perfects = 0;
+            state.mistakes = []; state.isReview = false;
+        }
+
+        function startPlay() {
+            utils.hideAll();
+            DOM.header.classList.remove('hidden');
+            DOM.displays.name.textContent = state.name;
+            DOM.displays.timer.classList.toggle('hidden', !state.isTimed);
+            DOM.game.classList.remove('hidden');
+            updateTopBar();
+            renderQuestion();
+        }
+
+        function updateTopBar() {
+            DOM.displays.score.textContent = Math.round(state.score);
+            DOM.displays.prog.style.width = state.isReview ? '100%' : \`\${(state.qIdx / 20) * 100}%\`;
+            let q = state.isReview ? state.revList[state.revIdx] : QUESTION_BANK[state.qIdx];
+            DOM.displays.stage.textContent = state.isReview ? "Ôn tập" : STAGES[q.stage].split(' — ')[0];
+            DOM.displays.qNum.textContent = state.isReview ? \`\${state.revIdx + 1}/\${state.revList.length}\` : state.qIdx + 1;
+        }
+
+        function startTimer() {
+            stopTimer();
+            state.timeRem = 60;
+            updateTimerDisplay();
+            DOM.displays.timer.style.color = "var(--teal)";
+            state.timer = setInterval(() => {
+                state.timeRem--;
+                updateTimerDisplay();
+                if(state.timeRem <= 10) DOM.displays.timer.style.color = "var(--danger)";
+                if(state.timeRem <= 0) { stopTimer(); checkAnswer(true); }
+            }, 1000);
+        }
+
+        function stopTimer() { if(state.timer) { clearInterval(state.timer); state.timer = null; } }
+        function updateTimerDisplay() { DOM.displays.timer.textContent = \`00:\${state.timeRem.toString().padStart(2, '0')}\`; }
+
+        function renderQuestion() {
+            state.locked = false;
+            DOM.fb.style.display = 'none';
+            DOM.fbGraph.innerHTML = '';
+            DOM.btnCheck.classList.remove('hidden');
+            DOM.btnNext.classList.add('hidden');
+            DOM.btnReset.classList.add('hidden');
+            dndState.selected = null;
+
+            let q = state.isReview ? state.revList[state.revIdx] : QUESTION_BANK[state.qIdx];
+            updateTopBar();
+            
+            if (q.type === 'fill') {
+                let qHtml = q.q.replace('[INPUT]', \`<input type="text" class="input-fill" id="fill-inp" autocomplete="off">\`);
+                DOM.qText.innerHTML = \`<strong>Câu \${DOM.displays.qNum.textContent}:</strong> \${qHtml}\`;
+                DOM.ansArea.innerHTML = \`<div style="text-align:center; color: var(--text-muted); margin: 2rem 0; font-style: italic;">Nhập câu trả lời của bạn vào chỗ trống phía trên.</div>\`;
+                setTimeout(() => { let el = document.getElementById('fill-inp'); if(el) el.focus(); }, 100);
+            } else {
+                DOM.qText.innerHTML = \`<strong>Câu \${DOM.displays.qNum.textContent}:</strong> \${q.q}\`;
+                DOM.ansArea.innerHTML = "";
+                if (q.type === 'mcq') {
+                    let opts = utils.shuffle(q.opts);
+                    let html = \`<div style="display:flex; flex-direction:column;">\`;
+                    opts.forEach((o) => {
+                        html += \`
+                        <label class="mcq-label">
+                            <input type="radio" name="mcq" value="\${o.replace(/"/g, '&quot;')}" class="mcq-radio">
+                            <div class="mcq-option">
+                                <div style="width:20px; height:20px; border-radius:50%; border:2px solid var(--text-muted); margin-right:1rem; display:flex; align-items:center; justify-content:center;">
+                                    <div style="width:10px; height:10px; border-radius:50%; background:var(--teal); opacity:0; transition:0.2s;" class="mcq-dot"></div>
+                                </div>
+                                <div>\${o}</div>
+                            </div>
+                        </label>\`;
+                    });
+                    html += \`</div>\`;
+                    DOM.ansArea.innerHTML = html;
+                    document.querySelectorAll('.mcq-radio').forEach(r => {
+                        r.addEventListener('change', function() {
+                            document.querySelectorAll('.mcq-dot').forEach(d => d.style.opacity = '0');
+                            if(this.checked) this.nextElementSibling.querySelector('.mcq-dot').style.opacity = '1';
+                        });
+                    });
+                } 
+                else if (q.type === 'tf') {
+                    DOM.ansArea.innerHTML = \`
+                    <div class="tf-container">
+                        <label style="flex:1;"><input type="radio" name="tf" value="Đúng" class="tf-radio"><div class="tf-option opt-true">ĐÚNG</div></label>
+                        <label style="flex:1;"><input type="radio" name="tf" value="Sai" class="tf-radio"><div class="tf-option opt-false">SAI</div></label>
+                    </div>\`;
+                }
+                else if (q.type === 'dnd' || q.type === 'dnd-group') {
+                    DOM.btnReset.classList.remove('hidden');
+                    let items = utils.shuffle([...q.items]);
+                    let html = \`<div style="text-align:center; font-style:italic; color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">Chạm thẻ để chọn, sau đó chạm vào vùng nét đứt để đặt vào.</div>\`;
+                    
+                    if (q.layout === 'sort') {
+                        html += \`<div class="dnd-sort-container" id="drop-zones">\`;
+                        q.targets.forEach((t, i) => {
+                            html += \`<div class="dnd-sort-row"><div class="dnd-sort-number">\${i+1}</div><div class="dnd-slot" data-tgt="\${t}"></div></div>\`;
+                        });
+                        html += \`</div>\`;
+                    } else if (q.layout === 'list') {
+                        html += \`<div class="dnd-targets" id="drop-zones">\`;
+                        q.targets.forEach(t => {
+                            html += \`<div class="dnd-target-row"><div class="dnd-target-label">\${t}</div><div class="dnd-slot" data-tgt="\${t.replace(/"/g, '&quot;')}"></div></div>\`;
+                        });
+                        html += \`</div>\`;
+                    } else if (q.type === 'dnd-group') {
+                        html += \`<div class="dnd-group-container" id="drop-zones">\`;
+                        q.targets.forEach(t => {
+                            html += \`<div class="dnd-group"><div class="dnd-group-title">\${t}</div><div class="dnd-slots-grid">\`;
+                            for(let i=0; i<q.slotsPerGroup; i++) {
+                                html += \`<div class="dnd-slot" data-tgt="\${t}"></div>\`;
+                            }
+                            html += \`</div></div>\`;
+                        });
+                        html += \`</div>\`;
+                    }
+
+                    html += \`<div style="text-align:center; margin: 1.5rem 0 0.5rem; font-weight:bold; font-size:0.9rem; color:var(--teal);">KHO THẺ</div>\`;
+                    html += \`<div class="dnd-pool" id="dnd-pool">\`;
+                    items.forEach(item => {
+                        html += \`<div class="dnd-item" data-val="\${item.replace(/"/g, '&quot;')}">\${item}</div>\`;
+                    });
+                    html += \`</div>\`;
+                    DOM.ansArea.innerHTML = html;
+                    initDragDropTap();
+                }
+            }
+
+            if (!state.isReview && state.isTimed) startTimer();
+        }
+
+        function initDragDropTap() {
+            const items = document.querySelectorAll('.dnd-item');
+            const slots = document.querySelectorAll('.dnd-slot');
+            const pool = document.getElementById('dnd-pool');
+
+            function clearSelection() {
+                if(dndState.selected) dndState.selected.classList.remove('selected');
+                dndState.selected = null;
+            }
+
+            items.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (state.locked) return;
+                    e.stopPropagation();
+                    if (dndState.selected === item) {
+                        clearSelection();
+                    } else {
+                        clearSelection();
+                        dndState.selected = item;
+                        item.classList.add('selected');
+                    }
+                });
+            });
+
+            slots.forEach(slot => {
+                slot.addEventListener('click', () => {
+                    if (state.locked) return;
+                    if (dndState.selected) {
+                        let sel = dndState.selected;
+                        let oldParent = sel.parentNode;
+                        if (slot.children.length > 0) {
+                            let existing = slot.children[0];
+                            oldParent.appendChild(existing);
+                            slot.appendChild(sel);
+                        } else {
+                            slot.appendChild(sel);
+                        }
+                        clearSelection();
+                    }
+                });
+            });
+
+            pool.addEventListener('click', () => {
+                if (state.locked) return;
+                if (dndState.selected && dndState.selected.parentNode.id !== 'dnd-pool') {
+                    pool.appendChild(dndState.selected);
+                    clearSelection();
+                }
+            });
+
+            DOM.btnReset.onclick = () => {
+                if (state.locked) return;
+                clearSelection();
+                document.querySelectorAll('.dnd-item').forEach(item => pool.appendChild(item));
+            };
+        }
+
+        DOM.btnCheck.addEventListener('click', () => checkAnswer(false));
+
+        function checkAnswer(isTimeout = false) {
+            if(state.locked) return;
+            let q = state.isReview ? state.revList[state.revIdx] : QUESTION_BANK[state.qIdx];
+            let pts = 0;
+            let isFull = false;
+
+            if (q.type === 'mcq') {
+                let rd = document.querySelector('input[name="mcq"]:checked');
+                if(!rd && !isTimeout) { alert("Em hãy chọn một phương án!"); return; }
+                state.locked = true;
+                if(rd && rd.value === q.ans) { pts = 10; isFull = true; }
+            } 
+            else if (q.type === 'tf') {
+                let rd = document.querySelector('input[name="tf"]:checked');
+                if(!rd && !isTimeout) { alert("Em hãy chọn Đúng hoặc Sai!"); return; }
+                state.locked = true;
+                if(rd && rd.value === q.ans) { pts = 10; isFull = true; }
+            }
+            else if (q.type === 'fill') {
+                let inp = document.getElementById('fill-inp');
+                let val = inp.value;
+                if(val.trim() === '' && !isTimeout) { alert("Em hãy điền vào chỗ trống!"); return; }
+                state.locked = true;
+                inp.disabled = true;
+                let normVal = utils.normStr(val);
+                if(q.ansNorms.includes(normVal)) {
+                    pts = 10; isFull = true;
+                    inp.style.color = "var(--success)"; inp.style.borderColor = "var(--success)";
+                } else {
+                    inp.style.color = "var(--danger)"; inp.style.borderColor = "var(--danger)";
+                }
+            }
+            else if (q.type.startsWith('dnd')) {
+                let slots = document.querySelectorAll('.dnd-slot');
+                let filled = Array.from(slots).filter(s => s.children.length > 0);
+                if (filled.length < slots.length && !isTimeout) { alert("Em hãy điền đủ các thẻ!"); return; }
+                state.locked = true;
+                document.querySelectorAll('.dnd-item').forEach(i => {
+                    i.classList.remove('selected');
+                    i.style.pointerEvents = 'none';
+                    i.style.boxShadow = 'none';
+                });
+                DOM.btnReset.classList.add('hidden');
+                let correctCnt = 0;
+                let totalReq = q.type === 'dnd' ? q.targets.length : Object.keys(q.correctGroups).reduce((acc,k)=>acc+q.slotsPerGroup,0);
+
+                if (q.type === 'dnd') {
+                    slots.forEach(s => {
+                        let tgt = s.getAttribute('data-tgt');
+                        if (s.children.length > 0) {
+                            let itemVal = s.children[0].getAttribute('data-val');
+                            let expected = q.pairs[tgt];
+                            let isCorr = (itemVal === expected);
+                            if (isCorr) {
+                                correctCnt++;
+                                s.style.borderColor = "var(--success)"; s.style.backgroundColor = "var(--success-dim)";
+                            } else {
+                                s.style.borderColor = "var(--danger)"; s.style.backgroundColor = "var(--danger-dim)";
+                            }
+                        } else {
+                            s.style.borderColor = "var(--danger)";
+                        }
+                    });
+                } 
+                else if (q.type === 'dnd-group') {
+                    slots.forEach(s => {
+                        let grp = s.getAttribute('data-tgt');
+                        if (s.children.length > 0) {
+                            let itemVal = s.children[0].getAttribute('data-val');
+                            if (q.correctGroups[grp].includes(itemVal)) {
+                                correctCnt++;
+                                s.style.borderColor = "var(--success)"; s.style.backgroundColor = "var(--success-dim)";
+                            } else {
+                                s.style.borderColor = "var(--danger)"; s.style.backgroundColor = "var(--danger-dim)";
+                            }
+                        } else {
+                            s.style.borderColor = "var(--danger)";
+                        }
+                    });
+                }
+                pts = (correctCnt / totalReq) * 10;
+                if(correctCnt === totalReq) isFull = true;
+            }
+
+            stopTimer();
+            if (!state.isReview) {
+                state.score += pts;
+                state.stageScores[q.stage] += pts;
+                if(isFull) state.perfects++;
+                else state.mistakes.push(q);
+                updateTopBar();
+            }
+
+            showFeedback(q, pts, isFull, isTimeout);
+        }
+
+        function showFeedback(q, pts, isFull, isTimeout) {
+            DOM.fb.style.display = 'block';
+            DOM.fb.className = 'feedback-box ' + (isFull ? 'correct' : (pts > 0 ? 'partial' : 'incorrect'));
+            let title = "";
+            if(state.isReview) {
+                title = isFull ? "🎉 Em nhớ bài rất tốt!" : "💡 Chú ý ghi nhớ nhé!";
+            } else {
+                if(isFull) title = \`🎉 Chính xác! (+10 điểm)\`;
+                else if(pts>0) title = \`👍 Gần đúng! (+\${pts.toFixed(1)} điểm)\`;
+                else title = isTimeout ? "⏰ Hết giờ! (0 điểm)" : "💡 Em hãy xem lại... (0 điểm)";
+            }
+            DOM.fbTitle.textContent = title;
+            let ansText = "Đáp án: ";
+            if(q.type === 'mcq' || q.type === 'tf') ansText += q.ans;
+            else if(q.type === 'fill') ansText += \`<span class="math-normal">\${q.dispAns}</span>\`;
+            else ansText += "Hãy xem kỹ giải thích và đối chiếu với sắp xếp đúng.";
+            DOM.fbAns.innerHTML = ansText;
+            DOM.fbExp.innerHTML = "<strong>Giải thích:</strong> " + q.exp;
+
+            if (q.graphReq) {
+                DOM.fbGraph.innerHTML = \`<div class="graph-container">\${generateSVGGraph(q.graphReq)}</div>\`;
+            }
+
+            DOM.btnCheck.classList.add('hidden');
+            DOM.btnNext.classList.remove('hidden');
+            DOM.fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function generateSVGGraph(type) {
+            const axis = \`<line x1="0" y1="100" x2="200" y2="100" stroke="#94A3B8" stroke-width="1.5"/><line x1="100" y1="0" x2="100" y2="200" stroke="#94A3B8" stroke-width="1.5"/>
+                          <text x="190" y="115" fill="#94A3B8" font-size="12" font-style="italic">x</text><text x="85" y="15" fill="#94A3B8" font-size="12" font-style="italic">y</text>
+                          <text x="105" y="115" fill="#94A3B8" font-size="12">O</text>\`;
+            let shade = "", line = "", lbl = "", extra = "";
+            const p = (x,y) => \`\${100 + x*25},\${100 - y*25}\`; 
+            
+            if (type === "q4") {
+                shade = \`<polygon points="\${p(-4,4)} \${p(2.5,4)} \${p(-1.5,-4)} \${p(-4,-4)}" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="\${p(-1.5,-4).split(',')[0]}" y1="200" x2="\${p(2.5,4).split(',')[0]}" y2="0" stroke="#64FFDA" stroke-width="2"/>\`;
+                lbl = \`<text x="130" y="20" fill="#64FFDA" font-size="12">y = 2x - 1</text>\`;
+            }
+            else if (type === "q5" || type === "q14") {
+                shade = \`<polygon points="\${p(-4,4)} \${p(-2,4)} \${p(4,-2)} \${p(4,-4)} \${p(-4,-4)}" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="\${p(-2,4).split(',')[0]}" y1="0" x2="\${p(4,-2).split(',')[0]}" y2="150" stroke="#64FFDA" stroke-width="2" stroke-dasharray="5,5"/>\`;
+                lbl = \`<text x="140" y="160" fill="#64FFDA" font-size="12">x + y = 2</text>\`;
+            }
+            else if (type === "q8") {
+                shade = \`<polygon points="\${p(-4,-4)} \${p(-3,-4)} \${p(4,3)} \${p(4,-4)}" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="25" y1="200" x2="200" y2="25" stroke="#64FFDA" stroke-width="2"/>\`;
+                lbl = \`<text x="130" y="40" fill="#64FFDA" font-size="12">x - y = 1</text>\`;
+            }
+            else if (type === "q9") {
+                shade = \`<polygon points="\${p(-4,-4)} \${p(-4,-4)} \${p(4,4)} \${p(4,-4)}" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="0" y1="200" x2="200" y2="0" stroke="#64FFDA" stroke-width="2" stroke-dasharray="5,5"/>\`;
+                lbl = \`<text x="160" y="25" fill="#64FFDA" font-size="12">x - y = 0</text>\`;
+                extra = \`<circle cx="125" cy="100" r="3" fill="#FBBF24"/><text x="120" y="90" fill="#FBBF24" font-size="10">(1;0)</text>\`;
+            }
+            else if (type === "q10") {
+                shade = \`<polygon points="0,0 150,0 150,200 0,200" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="150" y1="0" x2="150" y2="200" stroke="#64FFDA" stroke-width="2" stroke-dasharray="5,5"/>\`;
+                lbl = \`<text x="155" y="20" fill="#64FFDA" font-size="12">x = 2</text>\`;
+            }
+            else if (type === "q15") {
+                shade = \`<polygon points="0,0 200,0 200,75 0,75" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="0" y1="75" x2="200" y2="75" stroke="#64FFDA" stroke-width="2" stroke-dasharray="5,5"/>\`;
+                lbl = \`<text x="10" y="70" fill="#64FFDA" font-size="12">y = 1</text>\`;
+            }
+            else if (type === "q19") {
+                shade = \`<polygon points="\${p(-4,4)} \${p(0,4)} \${p(4,-4)} \${p(-4,-4)}" fill="rgba(100, 255, 218, 0.2)" />\`;
+                line = \`<line x1="100" y1="0" x2="200" y2="200" stroke="#64FFDA" stroke-width="2"/>\`;
+                lbl = \`<text x="155" y="160" fill="#64FFDA" font-size="12">2x + y = 4</text>\`;
+            }
+
+            return \`<svg viewBox="0 0 200 200" style="background:#1E293B; border-radius:4px; max-height:200px; width:100%;">
+                        \${shade} \${axis} \${line} \${lbl} \${extra}
+                    </svg>\`;
+        }
+
+        DOM.btnNext.addEventListener('click', () => {
+            if (state.isReview) {
+                state.revIdx++;
+                if (state.revIdx < state.revList.length) renderQuestion();
+                else { utils.hideAll(); DOM.final.classList.remove('hidden'); DOM.header.classList.add('hidden');}
+                return;
+            }
+
+            let curStg = QUESTION_BANK[state.qIdx].stage;
+            state.qIdx++;
+
+            if (state.qIdx < QUESTION_BANK.length) {
+                let nxtStg = QUESTION_BANK[state.qIdx].stage;
+                if (nxtStg !== curStg) {
+                    utils.hideAll();
+                    DOM.stage.classList.remove('hidden');
+                    document.getElementById('stage-name-summary').textContent = STAGES[curStg];
+                    document.getElementById('stage-score-summary').textContent = \`\${Math.round(state.stageScores[curStg])}/50\`;
+                } else {
+                    renderQuestion();
+                }
+            } else {
+                showFinal();
+            }
+        });
+
+        DOM.btnNextStage.addEventListener('click', () => {
+            utils.hideAll();
+            DOM.game.classList.remove('hidden');
+            renderQuestion();
+        });
+
+        function showFinal() {
+            utils.hideAll();
+            DOM.header.classList.add('hidden');
+            DOM.final.classList.remove('hidden');
+            document.getElementById('final-name').textContent = state.name;
+            document.getElementById('final-score').textContent = \`\${Math.round(state.score)} / 200\`;
+            document.getElementById('final-perfect').textContent = \`\${state.perfects} / 20\`;
+
+            let bkdn = "";
+            STAGES.forEach((s, i) => {
+                let sc = Math.round(state.stageScores[i]);
+                bkdn += \`<div class="flex justify-between" style="padding: 0.3rem 0;"><span style="color:var(--text-muted);">\${s.split(' — ')[0]}</span><span class="font-bold text-gold">\${sc}/50</span></div>\`;
+            });
+            document.getElementById('final-stages-breakdown').innerHTML = bkdn;
+
+            let adv = "🏆 Tuyệt vời! Em đã làm chủ hoàn toàn kiến thức Bất phương trình bậc nhất hai ẩn!";
+            if(state.mistakes.length > 0) {
+                adv = "💡 Lời khuyên: Em hãy chú ý kiểm tra lại nét đứt/liền của đường biên và vị trí điểm thử nhé.";
+                DOM.btnReview.classList.remove('hidden');
+                document.getElementById('review-container').classList.remove('hidden');
+                let rvHtml = "";
+                state.mistakes.forEach(m => {
+                    let txt = m.q.replace(/\\[INPUT\\]/, '___');
+                    rvHtml += \`<div class="review-item"><div class="font-bold">Câu \${m.id}:</div><div style="color:var(--text-muted);">\${txt}</div></div>\`;
+                });
+                document.getElementById('review-list').innerHTML = rvHtml;
+            } else {
+                DOM.btnReview.classList.add('hidden');
+                document.getElementById('review-container').classList.add('hidden');
+            }
+            document.getElementById('final-advice').textContent = adv;
+        }
+
+        DOM.btnReview.addEventListener('click', () => {
+            state.isReview = true;
+            state.revList = [...state.mistakes];
+            state.revIdx = 0;
+            utils.hideAll();
+            DOM.header.classList.remove('hidden');
+            DOM.displays.timer.classList.add('hidden');
+            DOM.game.classList.remove('hidden');
+            renderQuestion();
+        });
+    </script>
+</body>
+</html>`;
+
+export const gamesChapter2: LearningItem[] = [
+  {
+    id: 'game-mien-nghiem',
+    type: 'game',
+    title: 'Giải Mã Miền Nghiệm',
+    topic: 'Chương 2: Bất phương trình & Hệ BPT bậc nhất hai ẩn',
+    description: 'Khám phá nửa mặt phẳng nghiệm, điểm thử, đường biên nét đứt/liền và bài toán thực tế của bất phương trình bậc nhất hai ẩn.',
+    htmlContent: htmlGiaiMaMienNghiem,
+    displayOrder: 3,
+    isSample: true,
+    createdAt: '2026-09-02T08:00:00.000Z',
+    updatedAt: '2026-09-02T08:00:00.000Z'
+  }
+];

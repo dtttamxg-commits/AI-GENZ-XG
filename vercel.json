@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": { "api/index.ts": { "includeFiles": "public/**", "maxDuration": 60 } },
+  "routes": [
+    {"src":"/api/(.*)","dest":"/api/index"},
+    {"src":"/sandbox/(.*)","dest":"/api/index"},
+    {"src":"/mindmaps/(.*)","dest":"/api/index"},
+    {"src":"/infographics/(.*)","dest":"/api/index"},
+    {"handle":"filesystem"},
+    {"src":"/(.*)","dest":"/index.html"}
+  ]
+}
