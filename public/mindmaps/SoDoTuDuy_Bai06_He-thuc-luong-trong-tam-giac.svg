@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1050" width="1600" height="1050">
+  <defs>
+    <filter id="cardShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="centerShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.18" />
+    </filter>
+    <linearGradient id="centerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f0fdf4" />
+    </linearGradient>
+    <pattern id="patternDots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="1.5" fill="#94a3b8" opacity="0.22" />
+    </pattern>
+  </defs>
+
+  <!-- Background Layer -->
+  <rect width="1600" height="1050" fill="url(#bgGrad)" />
+  <circle cx="180" cy="180" r="320" fill="#10b981" opacity="0.04" />
+  <circle cx="1420" cy="870" r="360" fill="#059669" opacity="0.04" />
+  <rect width="1600" height="1050" fill="url(#patternDots)" />
+
+  <!-- Outer Border Frame -->
+  <rect x="20" y="20" width="1560" height="1010" rx="24" fill="none" stroke="#bbf7d0" stroke-width="2" opacity="0.8" />
+
+  <!-- TOP HEADER BANNER -->
+  <g transform="translate(45, 36)">
+    <rect width="1510" height="84" rx="20" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5" filter="url(#cardShadow)" />
+    
+    <!-- Chapter Tag Badge -->
+    <rect x="24" y="20" width="136" height="44" rx="12" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" />
+    <text x="92" y="48" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="800" fill="#065f46" text-anchor="middle">
+      Chương III
+    </text>
+
+    <!-- Title & Subtitle -->
+    <text x="180" y="44" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="22" font-weight="900" fill="#0f172a">
+      Bài 6: Hệ thức lượng trong tam giác
+    </text>
+    <text x="180" y="68" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
+      Sơ đồ tư duy kiến thức cốt lõi · GDPT 2018 · Môn Toán 10 (Hệ thức lượng trong tam giác)
+    </text>
+
+    <!-- Right Badge: Standard GDPT 2018 -->
+    <g transform="translate(1235, 22)">
+      <rect width="250" height="40" rx="12" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5" />
+      <circle cx="24" cy="20" r="7" fill="#10b981" />
+      <text x="42" y="25" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" fill="#065f46">
+        Sơ đồ tư duy chuẩn kiến thức
+      </text>
+    </g>
+  </g>
+
+  <!-- LEFT & RIGHT BRANCHES -->
+  
+      <!-- Left Branch 1 Connector -->
+      <path d="M 635 525 C 620 525, 560 362.5, 460 362.5" fill="none" stroke="#10b981" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+      <circle cx="460" cy="362.5" r="7" fill="#059669" stroke="#ffffff" stroke-width="2" />
+
+      <!-- Left Branch Card -->
+      <g transform="translate(45, 287.5)">
+        <!-- Card shadow & background -->
+        <rect width="415" height="150" rx="18" fill="#ffffff" stroke="#bbf7d0" stroke-width="2" filter="url(#cardShadow)" />
+        <rect x="0" y="0" width="415" height="42" rx="18" fill="#f0fdf4" opacity="0.9" />
+        <rect x="0" y="24" width="415" height="18" fill="#f0fdf4" opacity="0.9" />
+        
+        <!-- Left color stripe -->
+        <rect x="0" y="0" width="8" height="150" rx="4" fill="#059669" />
+
+        <!-- Card Header -->
+        <text x="20" y="27" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="800" fill="#065f46">
+          1. Định Lý Côsin
+        </text>
+        <g transform="translate(330, 10)">
+          <rect width="70" height="22" rx="6" fill="#dcfce7" stroke="#bbf7d0" stroke-width="1" />
+          <text x="35" y="15" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">
+            ĐL Côsin
+          </text>
+        </g>
+
+        <!-- Points list -->
+        
+        <g transform="translate(18, 58)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            a² = b² + c² - 2bc · cosA; b² = a² + c² - 2ac · cosB...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 86)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Hệ quả tính góc: cosA = (b² + c² - a²) / (2bc).
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 114)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Ứng dụng: Biết 2 cạnh và góc xen giữa (SAS) hoặc biế...
+          </text>
+        </g>
+      
+      </g>
+    
+
+      <!-- Left Branch 2 Connector -->
+      <path d="M 635 525 C 620 525, 560 550, 460 550" fill="none" stroke="#10b981" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+      <circle cx="460" cy="550" r="7" fill="#059669" stroke="#ffffff" stroke-width="2" />
+
+      <!-- Left Branch Card -->
+      <g transform="translate(45, 475)">
+        <!-- Card shadow & background -->
+        <rect width="415" height="150" rx="18" fill="#ffffff" stroke="#bbf7d0" stroke-width="2" filter="url(#cardShadow)" />
+        <rect x="0" y="0" width="415" height="42" rx="18" fill="#f0fdf4" opacity="0.9" />
+        <rect x="0" y="24" width="415" height="18" fill="#f0fdf4" opacity="0.9" />
+        
+        <!-- Left color stripe -->
+        <rect x="0" y="0" width="8" height="150" rx="4" fill="#059669" />
+
+        <!-- Card Header -->
+        <text x="20" y="27" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="800" fill="#065f46">
+          2. Định Lý Sin
+        </text>
+        <g transform="translate(330, 10)">
+          <rect width="70" height="22" rx="6" fill="#dcfce7" stroke="#bbf7d0" stroke-width="1" />
+          <text x="35" y="15" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">
+            ĐL Sin
+          </text>
+        </g>
+
+        <!-- Points list -->
+        
+        <g transform="translate(18, 58)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            a/sinA = b/sinB = c/sinC = 2R (với R là bán kính đườ...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 86)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Hệ quả: a = 2R · sinA; b = 2R · sinB; c = 2R · sinC.
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 114)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Ứng dụng: Biết 1 cạnh và 2 góc (ASA) hoặc biết 2 cạn...
+          </text>
+        </g>
+      
+      </g>
+    
+
+      <!-- Left Branch 3 Connector -->
+      <path d="M 635 525 C 620 525, 560 737.5, 460 737.5" fill="none" stroke="#10b981" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+      <circle cx="460" cy="737.5" r="7" fill="#059669" stroke="#ffffff" stroke-width="2" />
+
+      <!-- Left Branch Card -->
+      <g transform="translate(45, 662.5)">
+        <!-- Card shadow & background -->
+        <rect width="415" height="150" rx="18" fill="#ffffff" stroke="#bbf7d0" stroke-width="2" filter="url(#cardShadow)" />
+        <rect x="0" y="0" width="415" height="42" rx="18" fill="#f0fdf4" opacity="0.9" />
+        <rect x="0" y="24" width="415" height="18" fill="#f0fdf4" opacity="0.9" />
+        
+        <!-- Left color stripe -->
+        <rect x="0" y="0" width="8" height="150" rx="4" fill="#059669" />
+
+        <!-- Card Header -->
+        <text x="20" y="27" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="800" fill="#065f46">
+          3. Công Thức Đường Trung Tuyến
+        </text>
+        <g transform="translate(330, 10)">
+          <rect width="70" height="22" rx="6" fill="#dcfce7" stroke="#bbf7d0" stroke-width="1" />
+          <text x="35" y="15" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">
+            Trung tuyến
+          </text>
+        </g>
+
+        <!-- Points list -->
+        
+        <g transform="translate(18, 58)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            m_a² = (2b² + 2c² - a²) / 4 (độ dài trung tuyến kẻ t...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 86)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            m_b² = (2a² + 2c² - b²) / 4; m_c² = (2a² + 2b² - c²)...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 114)">
+          <circle cx="0" cy="0" r="4.5" fill="#059669" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Hệ quả: m_a² + m_b² + m_c² = 3/4 · (a² + b² + c²).
+          </text>
+        </g>
+      
+      </g>
+    
+  
+      <!-- Right Branch 4 Connector -->
+      <path d="M 965 525 C 980 525, 1040 425, 1140 425" fill="none" stroke="#10b981" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+      <circle cx="1140" cy="425" r="7" fill="#059669" stroke="#ffffff" stroke-width="2" />
+
+      <!-- Right Branch Card -->
+      <g transform="translate(1140, 328)">
+        <!-- Card shadow & background -->
+        <rect width="415" height="194" rx="18" fill="#ffffff" stroke="#bbf7d0" stroke-width="2" filter="url(#cardShadow)" />
+        <rect x="0" y="0" width="415" height="42" rx="18" fill="#f0fdf4" opacity="0.9" />
+        <rect x="0" y="24" width="415" height="18" fill="#f0fdf4" opacity="0.9" />
+        
+        <!-- Right color stripe -->
+        <rect x="407" y="0" width="8" height="194" rx="4" fill="#10b981" />
+
+        <!-- Card Header -->
+        <text x="20" y="27" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="800" fill="#065f46">
+          4. 5 Công Thức Tính Diện Tích Tam Giác (S)
+        </text>
+        <g transform="translate(320, 10)">
+          <rect width="80" height="22" rx="6" fill="#dcfce7" stroke="#bbf7d0" stroke-width="1" />
+          <text x="40" y="15" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">
+            Diện tích S
+          </text>
+        </g>
+
+        <!-- Points list -->
+        
+        <g transform="translate(18, 58)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            1) S = 1/2 · a · h_a = 1/2 · b · h_b = 1/2 · c · h_c.
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 86)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            2) S = 1/2 · ab · sinC = 1/2 · bc · sinA = 1/2 · ca ...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 114)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            3) S = abc / (4R) (R là bán kính ngoại tiếp).
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 142)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            4) S = p · r (p = (a+b+c)/2 là nửa chu vi, r là bán ...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 170)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            5) Heron: S = √[p(p - a)(p - b)(p - c)].
+          </text>
+        </g>
+      
+      </g>
+    
+
+      <!-- Right Branch 5 Connector -->
+      <path d="M 965 525 C 980 525, 1040 675, 1140 675" fill="none" stroke="#10b981" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+      <circle cx="1140" cy="675" r="7" fill="#059669" stroke="#ffffff" stroke-width="2" />
+
+      <!-- Right Branch Card -->
+      <g transform="translate(1140, 600)">
+        <!-- Card shadow & background -->
+        <rect width="415" height="150" rx="18" fill="#ffffff" stroke="#bbf7d0" stroke-width="2" filter="url(#cardShadow)" />
+        <rect x="0" y="0" width="415" height="42" rx="18" fill="#f0fdf4" opacity="0.9" />
+        <rect x="0" y="24" width="415" height="18" fill="#f0fdf4" opacity="0.9" />
+        
+        <!-- Right color stripe -->
+        <rect x="407" y="0" width="8" height="150" rx="4" fill="#10b981" />
+
+        <!-- Card Header -->
+        <text x="20" y="27" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="800" fill="#065f46">
+          5. Giải Tam Giác &amp; Đo Đạc Thực Tế
+        </text>
+        <g transform="translate(320, 10)">
+          <rect width="80" height="22" rx="6" fill="#dcfce7" stroke="#bbf7d0" stroke-width="1" />
+          <text x="40" y="15" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">
+            Thực tiễn
+          </text>
+        </g>
+
+        <!-- Points list -->
+        
+        <g transform="translate(18, 58)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Giải tam giác: Tìm các cạnh và góc còn lại khi biết ...
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 86)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Bài toán đo chiều cao cây/tháp khi không thể tới gốc.
+          </text>
+        </g>
+      
+
+        <g transform="translate(18, 114)">
+          <circle cx="0" cy="0" r="4.5" fill="#10b981" />
+          <text x="12" y="4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#334155">
+            Bài toán đo khoảng cách giữa hai điểm bị ngăn cách b...
+          </text>
+        </g>
+      
+      </g>
+    
+
+  <!-- CENTER CORE HUB (TÂM SƠ ĐỒ) -->
+  <g transform="translate(800, 525)">
+    <!-- Glowing pulse rings -->
+    <circle cx="0" cy="0" r="175" fill="#059669" opacity="0.06" />
+    <circle cx="0" cy="0" r="150" fill="#10b981" opacity="0.1" />
+    <circle cx="0" cy="0" r="125" fill="#10b981" opacity="0.15" />
+
+    <!-- Center Card Box -->
+    <rect x="-155" y="-95" width="310" height="190" rx="30" fill="url(#centerGrad)" filter="url(#centerShadow)" stroke="#ffffff" stroke-width="3" />
+    
+    <!-- Center text elements -->
+    <text x="0" y="-45" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="800" fill="#ffffff" opacity="0.9" text-anchor="middle" letter-spacing="1.5">
+      TRỌNG TÂM KIẾN THỨC
+    </text>
+    <text x="0" y="-12" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle">
+      HỆ THỨC LƯỢNG TAM GIÁC
+    </text>
+    <text x="0" y="22" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="700" fill="#ffffff" opacity="0.95" text-anchor="middle">
+      Toán 10 · Bài 6
+    </text>
+
+    <!-- Branch count badge -->
+    <rect x="-95" y="42" width="190" height="30" rx="10" fill="#ffffff" opacity="0.25" />
+    <text x="0" y="62" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">
+      5 NHÁNH PHÂN TÍCH
+    </text>
+  </g>
+
+  <!-- BOTTOM HIGHLIGHTS FOOTER -->
+  <g transform="translate(45, 974)">
+    <rect width="1510" height="48" rx="14" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5" filter="url(#cardShadow)" />
+    <text x="24" y="30" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="800" fill="#065f46">
+      ĐIỂM NHẤN CỐT LÕI:
+    </text>
+    <text x="175" y="30" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="600" fill="#475569">
+      ĐL Côsin: a² = b² + c² - 2bc · cosA   •   ĐL Sin: a/sinA = b/sinB = c/sinC = 2R   •   5 công thức diện tích: 1/2·ah, 1/2·ab·sinC, abc/(4R), pr, Heron
+    </text>
+  </g>
+</svg>
