@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thám Tử Sai Số & Số Gần Đúng - Toán 10</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0A192F',
+            'navy-light': '#112240',
+            'navy-lighter': '#233554',
+            teal: '#64FFDA',
+            gold: '#FBBF24',
+            danger: '#EF4444',
+            success: '#10B981',
+            accent: '#10B981'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            math: ['"Times New Roman"', 'Times', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0A192F; color: #E2E8F0; font-family: 'Inter', sans-serif; user-select: none; }
+    .math { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: italic; }
+    .math-normal { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: normal; }
+    .vec { display: inline-block; position: relative; font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: bold; padding-top: 0.3em; margin: 0 0.15em; }
+    .vec::after { content: '→'; position: absolute; top: -0.6em; left: 50%; transform: translateX(-50%); font-style: normal; font-weight: normal; font-size: 0.85em; }
+    .btn-opt { transition: all 0.15s ease; }
+    .btn-opt:hover { transform: translateY(-2px); border-color: #10B981; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-teal selection:text-navy">
+  <!-- Header -->
+  <header class="bg-navy-light/95 border-b border-navy-lighter px-4 py-3 sticky top-0 z-20 backdrop-blur-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          Chương 5: Thống Kê
+        </span>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-white leading-tight">Thám Tử Sai Số & Số Gần Đúng</h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Sai số tuyệt đối, sai số tương đối, quy tròn & độ chính xác d</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-right">
+        <div>
+          <span class="text-[11px] text-slate-400 block">Điểm số</span>
+          <span id="score-val" class="text-lg font-black text-gold">0</span>
+        </div>
+        <div>
+          <span class="text-[11px] text-slate-400 block">Câu hỏi</span>
+          <span id="q-counter" class="text-sm font-bold text-teal">1 / 8</span>
+        </div>
+      </div>
+    </div>
+    <!-- Progress bar -->
+    <div class="max-w-4xl mx-auto mt-2 h-1.5 bg-navy-lighter rounded-full overflow-hidden">
+      <div id="progress-fill" class="h-full bg-gradient-to-r from-teal to-gold transition-all duration-300" style="width: 0%"></div>
+    </div>
+  </header>
+
+  <!-- Main Game Stage -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+    <!-- Intro / Start Screen -->
+    <div id="intro-screen" class="bg-navy-light border border-navy-lighter rounded-2xl p-6 sm:p-8 text-center max-w-2xl mx-auto shadow-2xl">
+      <div class="w-16 h-16 rounded-2xl bg-teal/10 border border-teal/30 text-teal flex items-center justify-center text-3xl mx-auto mb-4">
+        🎮
+      </div>
+      <h2 class="text-2xl font-black text-white mb-2">Thám Tử Sai Số & Số Gần Đúng</h2>
+      <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+        Sai số tuyệt đối, sai số tương đối, quy tròn & độ chính xác d. Hoàn thành 8 thử thách với 4 chặng thi đấu để đạt danh hiệu Đại Kiện Tướng Toán Học!
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 text-left">
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 1</span>
+            <span class="text-xs font-semibold text-slate-200">Số gần đúng</span>
+          </div>
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 2</span>
+            <span class="text-xs font-semibold text-slate-200">Sai số tuyệt đối & d</span>
+          </div>
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 3</span>
+            <span class="text-xs font-semibold text-slate-200">Quy tròn chuẩn</span>
+          </div>
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 4</span>
+            <span class="text-xs font-semibold text-slate-200">Sai số tương đối</span>
+          </div>
+        
+      </div>
+      <button id="btn-start" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-teal to-emerald-400 text-navy font-black text-base shadow-lg shadow-teal/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+        🚀 BẮT ĐẦU THỬ THÁCH NGAY
+      </button>
+    </div>
+
+    <!-- Question Card -->
+    <div id="game-stage" class="hidden flex-col gap-5">
+      <div class="bg-navy-light border border-navy-lighter rounded-2xl p-5 sm:p-7 shadow-xl">
+        <!-- Stage & Tag -->
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-navy-lighter text-xs">
+          <span id="stage-badge" class="px-2.5 py-1 rounded-md bg-gold/10 text-gold font-bold border border-gold/20">
+            Chặng 1
+          </span>
+          <span id="q-hint-topic" class="text-slate-400">Toán 10 GDPT 2018</span>
+        </div>
+
+        <!-- Question Title -->
+        <div id="q-content" class="text-base sm:text-lg font-bold text-white mb-5 leading-relaxed">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Question Graphic / SVG Area (optional) -->
+        <div id="q-graphic" class="mb-5 hidden bg-slate-950/60 rounded-xl p-4 border border-navy-lighter flex justify-center items-center overflow-x-auto">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Options Container -->
+        <div id="options-box" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Feedback & Explanation Box -->
+        <div id="feedback-box" class="mt-5 p-4 rounded-xl hidden border">
+          <div id="feedback-title" class="font-bold text-sm mb-1"></div>
+          <div id="feedback-detail" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></div>
+          <div class="mt-4 flex justify-end">
+            <button id="btn-next" class="px-6 py-2.5 rounded-xl bg-gold text-navy font-bold text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all cursor-pointer">
+              Tiếp tục thử thách ➔
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Result Screen -->
+    <div id="result-screen" class="hidden bg-navy-light border border-navy-lighter rounded-2xl p-6 sm:p-8 text-center max-w-2xl mx-auto shadow-2xl">
+      <div id="result-medal" class="text-5xl mb-3">🏆</div>
+      <h2 class="text-2xl font-black text-white mb-1">KẾT QUẢ THỬ THÁCH</h2>
+      <p id="result-rank" class="text-sm font-bold text-teal mb-4">Đại Kiện Tướng Toán Học</p>
+      <div class="bg-navy/70 border border-navy-lighter rounded-xl p-4 mb-6 grid grid-cols-2 gap-4">
+        <div>
+          <span class="text-xs text-slate-400 block">Tổng điểm đạt được</span>
+          <span id="final-score" class="text-2xl font-black text-gold">0 / 100</span>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 block">Số câu chính xác</span>
+          <span id="final-correct" class="text-2xl font-black text-emerald-400">0 / 0</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button id="btn-restart" class="px-6 py-3 rounded-xl bg-teal text-navy font-bold text-sm hover:brightness-110 active:scale-95 transition-all cursor-pointer">
+          🔄 Thử thách lại
+        </button>
+        
+      </div>
+    </div>
+
+    
+  </main>
+
+  <footer class="py-3 text-center text-xs text-slate-500 border-t border-navy-lighter">
+    Học Liệu Số Toán 10 · Khám Phá Toán Học Tương Tác
+  </footer>
+
+  <script>
+    const QUESTIONS = [{"stage":1,"question":"Nếu a là số gần đúng của số đúng ā thì đại lượng Δa = |ā - a| được gọi là gì?","options":[{"label":"Sai số tuyệt đối của số gần đúng a"},{"label":"Sai số tương đối của số gần đúng a"},{"label":"Độ chính xác của phép đo"},{"label":"Số trung bình"}],"correct":0,"explanation":"Định nghĩa: Đại lượng Δa = |ā - a| phản ánh mức độ chênh lệch tuyệt đối giữa giá trị đúng và giá trị gần đúng, gọi là sai số tuyệt đối."},{"stage":1,"question":"Khi viết kết quả đo chiều dài l = 15,2 ± 0,2 m, số d = 0,2 m thể hiện điều gì?","options":[{"label":"Độ chính xác của phép đo (Δl ≤ 0,2)"},{"label":"Chiều dài thực sự của vật luôn bằng 0,2 m"},{"label":"Sai số tương đối là 20%"},{"label":"Chiều dài đo lần thứ hai"}],"correct":0,"explanation":"Kí hiệu a ± d có nghĩa là số đúng ā nằm trong khoảng [a - d; a + d], tức là sai số tuyệt đối không vượt quá d (Δa ≤ d), d gọi là độ chính xác."},{"stage":2,"question":"Quy tròn số 3,14159 đến chữ số thập phân thứ hai (hàng phần trăm) ta được kết quả:","options":[{"label":"3,14"},{"label":"3,15"},{"label":"3,142"},{"label":"3,1"}],"correct":0,"explanation":"Chữ số ngay sau hàng phần trăm là 1 (< 5), theo quy tắc làm tròn thì giữ nguyên chữ số hàng phần trăm: 3,14."},{"stage":2,"question":"Cho số gần đúng a = 12563 với độ chính xác d = 30. Hàng quy tròn thích hợp của a là:","options":[{"label":"Hàng trăm (vì d = 30 ở hàng chục, nên quy tròn đến hàng trăm)"},{"label":"Hàng đơn vị"},{"label":"Hàng chục"},{"label":"Hàng nghìn"}],"correct":0,"explanation":"Quy tắc: Độ chính xác d = 30 ở hàng chục, ta phải quy tròn số gần đúng a đến hàng cao hơn một bậc là hàng trăm. Do đó 12563 làm tròn đến hàng trăm là 12600."},{"stage":3,"question":"Sai số tương đối δa của số gần đúng a được tính bằng công thức nào?","options":[{"label":"δa = Δa / |a|"},{"label":"δa = Δa · |a|"},{"label":"δa = |a| / Δa"},{"label":"δa = Δa - |a|"}],"correct":0,"explanation":"Tỉ số giữa sai số tuyệt đối Δa và giá trị tuyệt đối của số gần đúng |a| chính là sai số tương đối δa = Δa / |a| (thường biểu diễn theo phần trăm)."},{"stage":3,"question":"Phép đo cây bút chì l₁ = 15 cm ± 0,1 cm và đo sân bóng l₂ = 100 m ± 0,2 m. Phép đo nào có chất lượng chính xác hơn?","options":[{"label":"Phép đo sân bóng l₂ (vì sai số tương đối nhỏ hơn rất nhiều)"},{"label":"Phép đo bút chì l₁ (vì 0,1 cm nhỏ hơn 0,2 m)"},{"label":"Hai phép đo có độ chính xác như nhau"},{"label":"Không thể so sánh được"}],"correct":0,"explanation":"Chất lượng phép đo đánh giá qua sai số tương đối: δ₁ = 0,1 / 15 ≈ 0,67%; trong khi δ₂ = 0,2 / 100 = 0,2%. Sai số tương đối của phép đo sân bóng nhỏ hơn nên chính xác hơn."},{"stage":4,"question":"Quy tròn số 28512 đến hàng nghìn ta được:","options":[{"label":"29000"},{"label":"28000"},{"label":"28500"},{"label":"30000"}],"correct":0,"explanation":"Chữ số ngay sau hàng nghìn là chữ số 5 ở hàng trăm (≥ 5), ta tăng chữ số hàng nghìn lên 1 đơn vị: 28512 ≈ 29000."},{"stage":4,"question":"Biết số đúng ā = 10/3 = 3,3333... Lấy a = 3,33 thì sai số tuyệt đối không vượt quá:","options":[{"label":"0,004"},{"label":"0,01"},{"label":"0,001"},{"label":"0,05"}],"correct":0,"explanation":"|10/3 - 3,33| = |10/3 - 333/100| = |(1000 - 999)/300| = 1/300 ≈ 0,00333... < 0,004."}];
+    const STAGES = ["Số gần đúng","Sai số tuyệt đối & d","Quy tròn chuẩn","Sai số tương đối"];
+
+    let currentQ = 0;
+    let score = 0;
+    let correctCount = 0;
+    let answered = false;
+
+    const DOM = {
+      intro: document.getElementById('intro-screen'),
+      stage: document.getElementById('game-stage'),
+      result: document.getElementById('result-screen'),
+      lab: document.getElementById('lab-screen'),
+      btnStart: document.getElementById('btn-start'),
+      btnRestart: document.getElementById('btn-restart'),
+      btnOpenLab: document.getElementById('btn-open-lab'),
+      btnCloseLab: document.getElementById('btn-close-lab'),
+      scoreVal: document.getElementById('score-val'),
+      qCounter: document.getElementById('q-counter'),
+      progressFill: document.getElementById('progress-fill'),
+      stageBadge: document.getElementById('stage-badge'),
+      qContent: document.getElementById('q-content'),
+      qGraphic: document.getElementById('q-graphic'),
+      optionsBox: document.getElementById('options-box'),
+      feedbackBox: document.getElementById('feedback-box'),
+      feedbackTitle: document.getElementById('feedback-title'),
+      feedbackDetail: document.getElementById('feedback-detail'),
+      btnNext: document.getElementById('btn-next'),
+      finalScore: document.getElementById('final-score'),
+      finalCorrect: document.getElementById('final-correct'),
+      resultRank: document.getElementById('result-rank')
+    };
+
+    DOM.btnStart.onclick = () => {
+      DOM.intro.classList.add('hidden');
+      DOM.stage.classList.remove('hidden');
+      DOM.stage.classList.add('flex');
+      loadQuestion(0);
+    };
+
+    DOM.btnRestart.onclick = () => {
+      currentQ = 0;
+      score = 0;
+      correctCount = 0;
+      DOM.scoreVal.textContent = '0';
+      DOM.result.classList.add('hidden');
+      DOM.stage.classList.remove('hidden');
+      DOM.stage.classList.add('flex');
+      loadQuestion(0);
+    };
+
+    if (DOM.btnOpenLab) {
+      DOM.btnOpenLab.onclick = () => {
+        DOM.result.classList.add('hidden');
+        DOM.lab.classList.remove('hidden');
+        if (typeof initLab === 'function') initLab();
+      };
+      DOM.btnCloseLab.onclick = () => {
+        DOM.lab.classList.add('hidden');
+        DOM.result.classList.remove('hidden');
+      };
+    }
+
+    function loadQuestion(idx) {
+      currentQ = idx;
+      answered = false;
+      const q = QUESTIONS[idx];
+      DOM.qCounter.textContent = (idx + 1) + ' / ' + QUESTIONS.length;
+      DOM.progressFill.style.width = ((idx / QUESTIONS.length) * 100) + '%';
+      DOM.stageBadge.textContent = 'Chặng ' + (q.stage || Math.floor(idx / 3) + 1) + ': ' + (STAGES[q.stage - 1] || 'Vận dụng');
+      DOM.qContent.innerHTML = q.question;
+
+      if (q.graphicSvg) {
+        DOM.qGraphic.innerHTML = q.graphicSvg;
+        DOM.qGraphic.classList.remove('hidden');
+      } else {
+        DOM.qGraphic.classList.add('hidden');
+      }
+
+      DOM.feedbackBox.classList.add('hidden');
+      DOM.optionsBox.innerHTML = '';
+
+      q.options.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-opt text-left p-4 rounded-xl bg-navy border border-navy-lighter hover:bg-navy-lighter text-sm sm:text-base font-semibold text-slate-200 cursor-pointer flex items-center justify-between gap-3';
+        btn.innerHTML = '<span>' + opt.label + '</span><span class="w-6 h-6 rounded-lg bg-navy-lighter flex items-center justify-center text-xs text-slate-400 font-bold">' + String.fromCharCode(65 + optIdx) + '</span>';
+        btn.onclick = () => handleAnswer(optIdx, btn);
+        DOM.optionsBox.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIdx, clickedBtn) {
+      if (answered) return;
+      answered = true;
+      const q = QUESTIONS[currentQ];
+      const isCorrect = selectedIdx === q.correct;
+      const allBtns = DOM.optionsBox.querySelectorAll('button');
+
+      allBtns.forEach((b, i) => {
+        b.disabled = true;
+        b.classList.remove('hover:bg-navy-lighter');
+        if (i === q.correct) {
+          b.classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300');
+        } else if (i === selectedIdx && !isCorrect) {
+          b.classList.add('bg-rose-950/80', 'border-rose-500', 'text-rose-300');
+        }
+      });
+
+      if (isCorrect) {
+        score += 10;
+        correctCount++;
+        DOM.scoreVal.textContent = score;
+        DOM.feedbackBox.className = 'mt-5 p-4 rounded-xl border border-emerald-500/50 bg-emerald-950/30 text-emerald-200 fade-in';
+        DOM.feedbackTitle.textContent = '🎉 CHÍNH XÁC! (+10 ĐIỂM)';
+      } else {
+        DOM.feedbackBox.className = 'mt-5 p-4 rounded-xl border border-rose-500/50 bg-rose-950/30 text-rose-200 fade-in';
+        DOM.feedbackTitle.textContent = '💡 CHƯA CHÍNH XÁC!';
+      }
+
+      DOM.feedbackDetail.innerHTML = q.explanation || 'Đáp án đúng là: ' + q.options[q.correct].label;
+      DOM.feedbackBox.classList.remove('hidden');
+    }
+
+    DOM.btnNext.onclick = () => {
+      if (currentQ + 1 < QUESTIONS.length) {
+        loadQuestion(currentQ + 1);
+      } else {
+        showResults();
+      }
+    };
+
+    function showResults() {
+      DOM.stage.classList.add('hidden');
+      DOM.stage.classList.remove('flex');
+      DOM.result.classList.remove('hidden');
+      DOM.progressFill.style.width = '100%';
+      DOM.finalScore.textContent = score + ' / ' + (QUESTIONS.length * 10);
+      DOM.finalCorrect.textContent = correctCount + ' / ' + QUESTIONS.length;
+
+      const pct = (correctCount / QUESTIONS.length) * 100;
+      if (pct >= 90) {
+        DOM.resultRank.textContent = '🌟 ĐẠI KIỆN TƯỚNG TOÁN HỌC (XUẤT SẮC)';
+      } else if (pct >= 70) {
+        DOM.resultRank.textContent = '🥈 BẬC THẦY TƯ DUY (KHÁ GIỎI)';
+      } else {
+        DOM.resultRank.textContent = '🥉 CHIẾN BINH TIỀM NĂNG (CẦN ÔN TẬP THÊM)';
+      }
+    }
+
+    
+  </script>
+</body>
+</html>

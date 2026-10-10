@@ -1,0 +1,143 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toán 10 – CHƯƠNG VIII: ĐẠI SỐ TỔ HỢP – BÀI 25: Nhị thức Newton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{--dam:#0F766E;--vua:#14B8A6;--nhat:#F0FDFA;}
+@page { size: 210mm 297mm; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+html { background: #0b1120; min-height: 100%; }
+body { width: 100%; min-height: 100vh; margin: 0; padding: 12px 6px; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start; background: #0b1120; overflow-x: auto; overflow-y: auto; font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif; color: #1F2937; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 794px; min-height: 1123px; max-width: 100%; margin: 0 auto; display: flex; flex-direction: column; background: radial-gradient(circle at 100% 0%, var(--nhat) 0, transparent 38%), radial-gradient(circle at 0% 100%, var(--nhat) 0, transparent 30%), #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); overflow: visible; }
+.hd { position: relative; padding: 16px 26px 14px 26px; color: #fff; overflow: hidden;
+  background: linear-gradient(120deg, var(--dam) 0%, var(--vua) 100%); }
+.hd::after { content: ""; position: absolute; right: -60px; top: -70px; width: 230px; height: 230px; border-radius: 50%;
+  background: rgba(255,255,255,.10); }
+.hd .ch { padding-right: 200px; font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .92; }
+.hd .row { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.hd .so { flex: none; width: 64px; height: 64px; border-radius: 18px; background: #FFD43B; color: var(--dam);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800;
+  box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+.hd .so.ot { width: 84px; } .hd .so.ot b { font-size: 1.7rem; }
+.hd .so small { font-size: .7rem; font-weight: 700; line-height: 1; }
+.hd .so b { font-size: 2rem; line-height: 1; }
+.hd h1 { font-size: 1.95rem; line-height: 1.12; font-weight: 800; text-transform: uppercase; letter-spacing: .01em; }
+.hd .muc { margin-top: 8px; font-size: .9rem; background: rgba(255,255,255,.16); border-radius: 10px; padding: 5px 10px;
+  display: inline-block; position: relative; z-index: 1; }
+.hd .tag { position: absolute; right: 22px; top: 14px; font-size: .72rem; font-weight: 700; background: rgba(0,0,0,.18);
+  border-radius: 20px; padding: 3px 10px; z-index: 1; }
+.main { flex: 1; min-height: 0; padding: 14px 20px 6px 20px; display: flex; flex-direction: column; }
+.blk { display: flex; gap: 14px; align-items: flex-start; flex-shrink: 0; } .main > .card { flex-shrink: 0; } .col { flex: 1; min-width: 0; }
+.pool { display: none; }
+.card { break-inside: avoid; background: #fff; border-radius: 14px; margin-bottom: 12px; padding: 10px 12px 10px 12px;
+  border: 1.5px solid color-mix(in srgb, var(--vua) 35%, #fff); box-shadow: 0 2px 0 color-mix(in srgb, var(--vua) 25%, #fff); }
+.card.span { }
+.card h2 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; font-weight: 800; color: var(--dam); margin-bottom: 6px; }
+.card h2 .n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--dam); color: #fff; font-size: .78rem;
+  display: flex; align-items: center; justify-content: center; }
+.card h2 .ic { font-size: 1.15rem; }
+.card p, .card li { line-height: 1.45; }
+.card p + p { margin-top: 4px; }
+.card ul { padding-left: 16px; } .card li { margin: 2px 0; } .card li::marker { color: var(--vua); }
+.f { background: #FFF7D1; border-left: 4px solid #F5B700; border-radius: 8px; padding: 6px 10px; margin: 6px 0;
+  text-align: center; font-size: 1.04rem; }
+.f.l { text-align: left; }
+.k { color: var(--dam); font-weight: 700; }
+mark { background: #FFEB99; color: inherit; padding: 0 2px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.do { color: #DC2626; font-weight: 700; }
+.xanh { color: #15803D; font-weight: 700; }
+.nho { font-size: .86rem; color: #4B5563; }
+.vd { background: var(--nhat); border-radius: 8px; padding: 5px 9px; margin-top: 6px; font-size: .9rem; }
+.vd b { color: var(--dam); }
+.ft { padding: 8px 24px 10px 24px; display: flex; justify-content: space-between; align-items: center;
+  font-size: .75rem; color: #6B7280; border-top: 1px dashed #D1D5DB; }
+.ft b { color: var(--dam); }
+table.t1 { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: .92rem; }
+table.t1 th, table.t1 td { border: 1px solid #E5E7EB; padding: 5px 8px; text-align: left; }
+table.t1 th { background: var(--nhat); color: var(--dam); font-weight: 700; }
+table.t1 td.c, table.t1 th.c { text-align: center; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0; }
+.box-pill { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 8px; font-size: .9rem; }
+
+@media print {
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+  .page { box-shadow: none !important; border-radius: 0 !important; width: 794px !important; height: 1123px !important; }
+}
+</style></head><body>
+<div class="page">
+<div class="hd">
+  <div class="ch">Chương VIII: Đại số tổ hợp</div>
+  <div class="row">
+    <div class="so "><small>BÀI</small><b>25</b></div>
+    <h1>Nhị thức Newton</h1>
+  </div>
+  <div class="muc">Khai triển $(a+b)^4$ và $(a+b)^5$, tam giác Pascal, quy luật hệ số đối xứng</div>
+  <div class="tag">NHỊ THỨC NEWTON LỚP 10</div>
+</div>
+<div class="main"></div>
+<div class="pool">
+
+  <div class="card span">
+    <h2><span class="n">1</span><span class="ic">📜</span>Khai triển Nhị thức Newton bậc 4 và bậc 5</h2>
+    <div class="f">
+      $$(a+b)^4 = a^4 + 4a^3b + 6a^2b^2 + 4ab^3 + b^4$$
+    </div>
+    <div class="f">
+      $$(a+b)^5 = a^5 + 5a^4b + 10a^3b^2 + 10a^2b^3 + 5ab^4 + b^5$$
+    </div>
+    <p class="nho">Hệ số tương ứng: với $n=4$ là $1, 4, 6, 4, 1$; với $n=5$ là $1, 5, 10, 10, 5, 1$.</p>
+  </div>
+  <div class="card">
+    <h2><span class="n">2</span><span class="ic">🔺</span>Tam giác Pascal</h2>
+    <p>Quy tắc tạo dòng mới: mỗi số bằng tổng hai số kề phía trên nó:</p>
+    <div class="box-pill text-center font-mono" style="line-height:1.6;">
+      <div>$n=0$: 1</div>
+      <div>$n=1$: 1 &nbsp; 1</div>
+      <div>$n=2$: 1 &nbsp; 2 &nbsp; 1</div>
+      <div>$n=3$: 1 &nbsp; 3 &nbsp; 3 &nbsp; 1</div>
+      <div>$n=4$: 1 &nbsp; 4 &nbsp; 6 &nbsp; 4 &nbsp; 1</div>
+      <div>$n=5$: 1 &nbsp; 5 &nbsp; 10 &nbsp; 10 &nbsp; 5 &nbsp; 1</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2><span class="n">3</span><span class="ic">⚠️</span>Kỹ năng Khai triển & Dấu trừ</h2>
+    <p>Khi có dấu trừ $(a - b)^n = [a + (-b)]^n$, các dấu đan xen <mark class="do">$+,-,+,-$</mark>:</p>
+    <div class="vd"><b>Ví dụ:</b> $(x - 2)^4 = x^4 - 4x^3(2) + 6x^2(2^2) - 4x(2^3) + 2^4 = x^4 - 8x^3 + 24x^2 - 32x + 16$.</div>
+    <p class="nho mt-1">Tổng các hệ số của $(a+b)^n$ tính nhanh bằng cách thay $a = 1, b = 1 \implies 2^n$.</p>
+  </div>
+  
+</div>
+<div class="ft">
+  <span>Tài liệu số hoá Toán 10 • GDPT 2018</span>
+  <span><b>Chương VIII: Đại số tổ hợp</b> • Nhị thức Newton</span>
+  <span>Bản quyền học liệu số Toán học</span>
+</div>
+</div>
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+ renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false});
+ var fs=13, pg=document.querySelector('.page'), m=document.querySelector('.main');
+ var cards=[].slice.call(document.querySelectorAll('.pool .card'));
+ function layout(){
+  m.innerHTML=''; var blk=null;
+  cards.forEach(function(c){
+   if(c.classList.contains('span')){ m.appendChild(c); blk=null; return; }
+   if(!blk){ blk=document.createElement('div'); blk.className='blk';
+     blk.innerHTML='<div class="col"></div><div class="col"></div>'; m.appendChild(blk); }
+   var a=blk.children[0], b=blk.children[1];
+   (a.offsetHeight<=b.offsetHeight?a:b).appendChild(c);
+  });
+ }
+ function over(){ layout(); return m.scrollHeight>m.clientHeight+1 || pg.scrollHeight>1125; }
+ function set(v){ fs=v; document.documentElement.style.fontSize=v+'px'; }
+ while(!over() && fs<17){ set(fs+0.25); }
+ while(over() && fs>10){ set(fs-0.25); }
+ set(fs-0.5); layout();
+ document.title += ' ['+fs+']';
+});
+</script></body></html>

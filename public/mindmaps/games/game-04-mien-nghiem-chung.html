@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chinh Phục Miền Nghiệm Chung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0A192F',
+                        'navy-light': '#112240',
+                        'navy-lighter': '#233554',
+                        teal: '#64FFDA',
+                        gold: '#FBBF24',
+                        danger: '#EF4444',
+                        success: '#10B981'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        math: ['"Times New Roman"', 'Times', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0A192F; color: #E2E8F0; overscroll-behavior-y: none; }
+        .math { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: italic; letter-spacing: 0.5px;}
+        .math-normal { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: normal; }
+        
+        .math-sys {
+            display: inline-flex;
+            align-items: center;
+        }
+        .math-sys::before {
+            content: "{";
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-right: 0.1em;
+            color: #64FFDA;
+            transform: scaleY(1.2);
+        }
+        .math-sys-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 0.2rem;}
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dnd-item { transition: all 0.2s; user-select: none; }
+        .dnd-item:active { transform: scale(0.95); }
+        .dnd-item.selected { border-color: #FBBF24 !important; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); background-color: #1E293B !important; transform: translateY(-2px); }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748B; }
+
+        .graph-container { background-color: #F8FAFC; border-radius: 8px; border: 2px solid #233554; overflow: hidden; }
+        .btn-action { transition: transform 0.1s; }
+        .btn-action:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen font-sans selection:bg-teal selection:text-navy">
+
+    <header id="game-header" class="bg-navy-light shadow-md border-b border-navy-lighter p-3 sticky top-0 z-20 hidden">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <span id="player-display" class="font-bold text-teal truncate max-w-[120px] md:max-w-[200px]">Người chơi</span>
+                <span id="stage-display" class="font-semibold text-gold bg-navy-lighter px-3 py-1 rounded-full text-xs md:text-sm">Chặng 1</span>
+            </div>
+            
+            <div class="flex items-center justify-between w-full md:w-auto gap-4">
+                <div class="text-xs text-gray-400">Câu <span id="q-num-display" class="text-white font-bold text-sm">1</span>/20</div>
+                <div id="timer-display" class="font-mono font-bold text-teal hidden px-2 py-1 bg-navy-lighter rounded flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="time-val">90s</span>
+                </div>
+                <div class="font-bold text-sm bg-navy px-3 py-1 rounded-lg border border-navy-lighter">
+                    Điểm: <span id="score-display" class="text-gold text-lg">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-4xl mx-auto mt-2 bg-navy-lighter h-1.5 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-teal to-gold h-full w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-3 md:p-6 w-full max-w-4xl mx-auto relative">
+        <div id="screen-start" class="w-full max-w-md bg-navy-light p-6 md:p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-navy-lighter fade-in mt-4 md:mt-0">
+            <div class="flex justify-center mb-4">
+                <div class="p-3 bg-teal bg-opacity-10 rounded-full">
+                    <svg class="w-12 h-12 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                </div>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-teal to-gold mb-3 leading-tight">
+                CHINH PHỤC MIỀN NGHIỆM CHUNG
+            </h1>
+            <p class="text-gray-300 text-center mb-6 text-sm">Thử thách 20 câu hỏi giải mã hệ bất phương trình bậc nhất hai ẩn - Toán 10.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Tên người chơi / Đội</label>
+                    <input type="text" id="input-name" class="w-full bg-navy-lighter border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal" placeholder="Nhập tên của bạn...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Thời gian thử thách</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="mode" value="normal" class="peer sr-only" checked>
+                            <div class="text-center p-3 border border-gray-600 rounded-lg peer-checked:border-teal peer-checked:bg-teal peer-checked:bg-opacity-10 peer-checked:text-teal transition-all text-sm font-medium">Không giới hạn</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="mode" value="timed" class="peer sr-only">
+                            <div class="text-center p-3 border border-gray-600 rounded-lg peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 peer-checked:text-gold transition-all text-sm font-medium">90s / Câu</div>
+                        </label>
+                    </div>
+                </div>
+                <button id="btn-start" class="w-full bg-teal text-navy font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(100,255,218,0.3)] hover:bg-emerald-400 btn-action text-lg mt-2">BẮT ĐẦU NGAY</button>
+            </div>
+        </div>
+
+        <div id="screen-game" class="w-full hidden fade-in py-2">
+            <div class="bg-navy-light rounded-2xl p-4 md:p-6 lg:p-8 shadow-xl border border-navy-lighter">
+                <div class="mb-6">
+                    <div class="flex items-start gap-2">
+                        <div class="bg-navy border border-gray-600 text-gray-400 px-2 py-1 rounded text-xs font-bold mt-1 whitespace-nowrap">CÂU <span id="q-idx-label"></span></div>
+                        <div id="question-text" class="text-lg md:text-xl font-medium leading-relaxed text-gray-100 flex-1">Nội dung câu hỏi</div>
+                    </div>
+                </div>
+                
+                <div id="answer-area" class="mb-6 min-h-[150px]"></div>
+
+                <div id="feedback-area" class="hidden mb-6 p-4 rounded-xl border">
+                    <div id="fb-title" class="font-bold text-lg mb-2 flex items-center gap-2"></div>
+                    <div id="fb-ans" class="text-gray-200 mb-2 p-3 bg-navy-lighter rounded-lg text-sm md:text-base border border-gray-700"></div>
+                    <div id="fb-exp" class="text-gray-300 text-sm md:text-base leading-relaxed"></div>
+                    
+                    <div id="fb-graph-container" class="hidden mt-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="font-semibold text-teal text-sm">Minh họa đồ thị</div>
+                            <button id="btn-view-steps" class="text-xs bg-navy-lighter px-3 py-1.5 rounded border border-gray-600 hover:border-teal text-gray-300 transition-colors">Xem từng bước</button>
+                        </div>
+                        <div class="graph-container flex justify-center p-2 md:p-4 bg-white relative">
+                            <div id="svg-wrapper" class="w-full max-w-[400px]"></div>
+                        </div>
+                        <div id="graph-note" class="text-xs text-gray-400 mt-2 text-center italic hidden">Miền nghiệm tiếp tục ngoài khung hình</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-6 border-t border-navy-lighter pt-4">
+                    <button id="btn-reset-dnd" class="hidden px-4 py-2 rounded-lg text-sm bg-navy border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">Xếp lại</button>
+                    <div class="flex-grow"></div>
+                    <button id="btn-check" class="px-8 py-3 rounded-xl font-bold bg-teal text-navy btn-action shadow-lg hover:bg-emerald-400">Kiểm tra</button>
+                    <button id="btn-next" class="hidden px-8 py-3 rounded-xl font-bold bg-gold text-navy btn-action shadow-lg hover:bg-yellow-400">Câu tiếp theo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-stage" class="w-full max-w-sm text-center hidden fade-in mt-10">
+            <div class="bg-navy-light p-8 rounded-2xl border border-navy-lighter shadow-2xl">
+                <div class="w-16 h-16 mx-auto bg-teal bg-opacity-20 text-teal rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h2 class="text-xl text-gray-300 mb-1">Hoàn thành chặng</h2>
+                <h3 id="stage-name-summary" class="text-2xl text-gold font-bold mb-6">Tên chặng</h3>
+                <div class="bg-navy-lighter p-4 rounded-xl mb-6">
+                    <div class="text-gray-400 text-sm mb-1">Điểm chặng này</div>
+                    <div id="stage-score-summary" class="text-4xl font-bold text-teal">50/50</div>
+                </div>
+                <button id="btn-next-stage" class="w-full bg-teal text-navy font-bold py-3 rounded-xl btn-action">Tiếp tục hành trình</button>
+            </div>
+        </div>
+
+        <div id="screen-final" class="w-full max-w-2xl hidden fade-in py-6">
+            <div class="bg-navy-light p-6 md:p-8 rounded-2xl border border-navy-lighter shadow-2xl">
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal to-gold mb-2 uppercase">GIẢI MÃ THÀNH CÔNG!</h1>
+                    <p id="final-name" class="text-lg text-gray-300"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-navy-lighter p-4 rounded-xl text-center border border-gray-700">
+                        <div class="text-gray-400 text-sm mb-1">Tổng điểm</div>
+                        <div id="final-score" class="text-3xl md:text-4xl font-bold text-gold"></div>
+                    </div>
+                    <div class="bg-navy-lighter p-4 rounded-xl text-center border border-gray-700">
+                        <div class="text-gray-400 text-sm mb-1">Số câu trọn vẹn</div>
+                        <div id="final-perfect" class="text-3xl md:text-4xl font-bold text-teal"></div>
+                    </div>
+                </div>
+
+                <div class="bg-navy p-4 rounded-xl border border-gray-700 mb-6">
+                    <h3 class="font-bold mb-3 border-b border-gray-600 pb-2 text-gray-200">Điểm từng chặng</h3>
+                    <div id="final-breakdown" class="space-y-2 text-sm md:text-base"></div>
+                </div>
+
+                <div id="final-advice" class="text-center bg-navy-lighter p-4 rounded-xl border-l-4 border-teal mb-6 text-sm md:text-base leading-relaxed text-gray-200 hidden"></div>
+
+                <div id="review-container" class="hidden mb-6">
+                    <h3 class="font-bold text-danger mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Các câu cần xem lại
+                    </h3>
+                    <div id="review-list" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="btn-review" class="hidden px-6 py-3 rounded-xl font-bold bg-navy text-gray-300 border border-gray-600 hover:bg-gray-800 transition-colors">Ôn câu sai</button>
+                    <button id="btn-restart" class="px-8 py-3 rounded-xl font-bold bg-teal text-navy btn-action shadow-lg hover:bg-emerald-400">Chơi lại từ đầu</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-xs text-gray-500 w-full bg-navy mt-auto border-t border-navy-light">
+        <p>Học Toán cùng Eliza Tâm Dương</p>
+    </footer>
+
+    <script>
+        const STAGES = [
+            "Cổng kiểm tra nghiệm",
+            "Thám tử miền chung",
+            "Ghép bản đồ nghiệm",
+            "Giải mã thực tế"
+        ];
+
+        const QUESTION_BANK = [
+            {
+                id: 1, stage: 0, type: "mcq",
+                q: "Hệ nào là hệ bất phương trình bậc nhất hai ẩn?",
+                opts: [
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x² + y ≤ 4</span><span class="math-normal">x ≥ 0</span></span></span>`,
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x + y ≤ 4</span><span class="math-normal">x − y ≥ 0</span></span></span>`,
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">xy ≤ 4</span><span class="math-normal">y ≥ 0</span></span></span>`,
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x + y² ≥ 1</span><span class="math-normal">x ≤ 3</span></span></span>`
+                ],
+                ans: `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x + y ≤ 4</span><span class="math-normal">x − y ≥ 0</span></span></span>`,
+                exp: "Mỗi điều kiện của hệ này đều là bất phương trình bậc nhất hai ẩn (x, y bậc 1)."
+            },
+            {
+                id: 2, stage: 0, type: "mcq",
+                q: `Cặp số nào là nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 4</span></span></span>?`,
+                opts: ["<span class='math'>(−1; 2)</span>", "<span class='math'>(3; 2)</span>", "<span class='math'>(1; 2)</span>", "<span class='math'>(2; −1)</span>"],
+                ans: "<span class='math'>(1; 2)</span>",
+                exp: "<span class='math'>(1; 2)</span> thỏa mãn cả ba điều kiện: 1 ≥ 0, 2 ≥ 0 và 1 + 2 = 3 ≤ 4."
+            },
+            {
+                id: 3, stage: 0, type: "mcq",
+                q: "Miền nghiệm của hệ bất phương trình là:",
+                opts: ["Giao của các miền nghiệm thành phần.", "Hợp của các miền nghiệm thành phần.", "Chỉ gồm các đường thẳng biên.", "Luôn là toàn bộ mặt phẳng."],
+                ans: "Giao của các miền nghiệm thành phần.",
+                exp: "Nghiệm của hệ phải thỏa mãn ĐỒNG THỜI tất cả các điều kiện, tức là thuộc vào phần giao."
+            },
+            {
+                id: 4, stage: 0, type: "mcq", graphReq: "q4",
+                q: `Miền nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 4</span></span></span> là tam giác kể cả biên có các đỉnh:`,
+                opts: [
+                    "<span class='math'>(0; 0), (2; 0), (0; 2)</span>", 
+                    "<span class='math'>(0; 0), (4; 0), (4; 4)</span>", 
+                    "<span class='math'>(0; 0), (0; 4), (4; 4)</span>", 
+                    "<span class='math'>(0; 0), (4; 0), (0; 4)</span>"
+                ],
+                ans: "<span class='math'>(0; 0), (4; 0), (0; 4)</span>",
+                exp: "Miền chung nằm trong góc phần tư thứ nhất, phía dưới đường x + y = 4 và lấy cả biên."
+            },
+            {
+                id: 5, stage: 0, type: "mcq", graphReq: "q5",
+                q: "Hệ nào vô nghiệm?",
+                opts: [
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 1</span><span class="math-normal">x ≤ 3</span></span></span>`,
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 3</span><span class="math-normal">x ≤ 1</span></span></span>`,
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span></span></span>`,
+                    `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x + y ≤ 2</span><span class="math-normal">x ≥ 0, y ≥ 0</span></span></span>`
+                ],
+                ans: `<span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 3</span><span class="math-normal">x ≤ 1</span></span></span>`,
+                exp: "Không có số thực x nào đồng thời lớn hơn hoặc bằng 3 và nhỏ hơn hoặc bằng 1."
+            },
+            {
+                id: 6, stage: 1, type: "tf",
+                q: "“Chỉ cần một cặp số thỏa mãn ít nhất một bất phương trình thì cặp số đó là nghiệm của hệ.”",
+                ans: "Sai", exp: "Cặp số phải thỏa mãn TẤT CẢ bất phương trình của hệ mới là nghiệm."
+            },
+            {
+                id: 7, stage: 1, type: "tf", graphReq: "q7",
+                q: `“Điểm M(2; 1) thuộc miền nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 3</span></span></span>.”`,
+                ans: "Đúng", exp: "2 ≥ 0, 1 ≥ 0 và 2 + 1 = 3 ≤ 3. Thỏa mãn cả 3 BPT."
+            },
+            {
+                id: 8, stage: 1, type: "tf", graphReq: "q8",
+                q: `“Điểm N(2; 1) thuộc miền nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y < 3</span></span></span>.”`,
+                ans: "Sai", exp: "N nằm trên đường biên x + y = 3, trong khi BPT thứ 3 dùng dấu < nên loại đường biên này."
+            },
+            {
+                id: 9, stage: 1, type: "tf", graphReq: "q9",
+                q: `“Miền nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span></span></span> không bị chặn.”`,
+                ans: "Đúng", exp: "Miền nghiệm là toàn bộ góc phần tư thứ nhất kéo dài vô hạn."
+            },
+            {
+                id: 10, stage: 1, type: "tf", graphReq: "q10",
+                q: `“Khi biểu diễn hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x > 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 4</span></span></span>, cả ba đường biên đều được vẽ nét liền.”`,
+                ans: "Sai", exp: "Đường x = 0 phải vẽ nét đứt vì x > 0."
+            },
+            {
+                id: 11, stage: 2, type: "dnd", layout: "list", graphReq: "q11",
+                q: "Ghép bất phương trình với mô tả miền nghiệm.",
+                targets: ["<span class='math'>x ≥ 0</span>", "<span class='math'>y ≥ 0</span>", "<span class='math'>x + y ≤ 4</span>"],
+                items: ["Phía bên phải trục Oy, kể cả trục Oy.", "Phía trên trục Ox, kể cả trục Ox.", "Phía chứa O(0; 0) của đường x + y = 4, kể cả đường biên."],
+                pairs: {
+                    "<span class='math'>x ≥ 0</span>": "Phía bên phải trục Oy, kể cả trục Oy.",
+                    "<span class='math'>y ≥ 0</span>": "Phía trên trục Ox, kể cả trục Ox.",
+                    "<span class='math'>x + y ≤ 4</span>": "Phía chứa O(0; 0) của đường x + y = 4, kể cả đường biên."
+                },
+                exp: "Miền nghiệm của hệ là phần chung của ba miền vừa xác định."
+            },
+            {
+                id: 12, stage: 2, type: "dnd-group", graphReq: "q12",
+                q: `Với hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 4</span></span></span>, kéo các điểm vào nhóm phù hợp.`,
+                targets: ["Thuộc miền nghiệm", "Không thuộc miền nghiệm"],
+                slotsPerGroup: 2,
+                items: ["A(1; 1)", "B(4; 0)", "C(3; 2)", "D(−1; 2)"],
+                correctGroups: {
+                    "Thuộc miền nghiệm": ["A(1; 1)", "B(4; 0)"],
+                    "Không thuộc miền nghiệm": ["C(3; 2)", "D(−1; 2)"]
+                },
+                exp: "C vi phạm x + y ≤ 4; D vi phạm x ≥ 0."
+            },
+            {
+                id: 13, stage: 2, type: "dnd", layout: "sort", graphReq: "q13",
+                q: `Sắp xếp các bước biểu diễn miền nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 4</span></span></span>.`,
+                targets: ["Bước 1", "Bước 2", "Bước 3", "Bước 4"],
+                items: [
+                    "Vẽ các đường biên x = 0, y = 0, x + y = 4 trên cùng hệ trục.",
+                    "Xác định phía nghiệm và việc lấy bờ của từng bất phương trình.",
+                    "Lấy phần giao của ba miền nghiệm.",
+                    "Đánh dấu miền tam giác OAB kể cả biên, với O(0; 0), A(4; 0), B(0; 4)."
+                ],
+                pairs: {
+                    "Bước 1": "Vẽ các đường biên x = 0, y = 0, x + y = 4 trên cùng hệ trục.",
+                    "Bước 2": "Xác định phía nghiệm và việc lấy bờ của từng bất phương trình.",
+                    "Bước 3": "Lấy phần giao của ba miền nghiệm.",
+                    "Bước 4": "Đánh dấu miền tam giác OAB kể cả biên, với O(0; 0), A(4; 0), B(0; 4)."
+                },
+                exp: "Miền nghiệm của hệ là phần giao nhau, thỏa mãn ĐỒNG THỜI cả ba điều kiện."
+            },
+            {
+                id: 14, stage: 2, type: "dnd", layout: "list",
+                q: "Ghép các cặp đường thẳng với tọa độ giao điểm.",
+                targets: ["x = 0 và x + y = 4", "y = 0 và x + y = 4", "x = 0 và y = 0"],
+                items: ["(0; 4)", "(4; 0)", "(0; 0)"],
+                pairs: {
+                    "x = 0 và x + y = 4": "(0; 4)",
+                    "y = 0 và x + y = 4": "(4; 0)",
+                    "x = 0 và y = 0": "(0; 0)"
+                },
+                exp: "Các giao điểm này chính là 3 đỉnh của miền tam giác OAB."
+            },
+            {
+                id: 15, stage: 2, type: "dnd", layout: "list",
+                q: "Một nhóm làm x mô hình A và y mô hình B. Mỗi A cần 2 tấm bìa, 1 giờ; mỗi B cần 1 tấm bìa, 2 giờ. Tối đa 12 tấm bìa, 12 giờ. Ghép thông tin với điều kiện:",
+                targets: ["Giới hạn số tấm bìa", "Giới hạn thời gian", "Số lượng không âm"],
+                items: ["2x + y ≤ 12", "x + 2y ≤ 12", "x ≥ 0, y ≥ 0"],
+                pairs: {
+                    "Giới hạn số tấm bìa": "2x + y ≤ 12",
+                    "Giới hạn thời gian": "x + 2y ≤ 12",
+                    "Số lượng không âm": "x ≥ 0, y ≥ 0"
+                },
+                exp: "Tổng tài nguyên không vượt quá lượng tối đa có sẵn."
+            },
+            {
+                id: 16, stage: 3, type: "fill",
+                q: "Miền nghiệm của hệ bất phương trình là phần [INPUT] của các miền nghiệm thành phần.",
+                ansNorms: ["giao", "chung", "giaonhau"], dispAns: "giao",
+                exp: "Các điểm trong phần giao sẽ thỏa mãn ĐỒNG THỜI tất cả các bất phương trình trong hệ."
+            },
+            {
+                id: 17, stage: 3, type: "fill",
+                q: `Cho hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 5</span></span></span>. Điểm M(2; a) thuộc miền nghiệm khi 0 ≤ a ≤ [INPUT].`,
+                ansNorms: ["3", "3.0"], dispAns: "3",
+                exp: "2 + a ≤ 5 suy ra a ≤ 3."
+            },
+            {
+                id: 18, stage: 3, type: "fill", graphReq: "q18",
+                q: `Miền nghiệm của hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0</span><span class="math-normal">y ≥ 0</span><span class="math-normal">x + y ≤ 6</span></span></span> là tam giác có các đỉnh O(0; 0), A(6; 0) và B(0; [INPUT]).`,
+                ansNorms: ["6", "6.0"], dispAns: "6",
+                exp: "Đỉnh B trên Oy có x = 0; thay vào x + y = 6 ta được y = 6."
+            },
+            {
+                id: 19, stage: 3, type: "fill", graphReq: "q19",
+                q: `Với hệ <span class="math-sys"><span class="math-sys-col"><span class="math-normal">x ≥ 0, y ≥ 0</span><span class="math-normal">2x + y ≤ 6</span><span class="math-normal">x + 2y ≤ 6</span></span></span>, giao điểm của hai đường 2x + y = 6 và x + 2y = 6 là I(2; [INPUT]).`,
+                ansNorms: ["2", "2.0"], dispAns: "2",
+                exp: "Giải hệ 2x + y = 6 và x + 2y = 6 ta được x = 2, y = 2."
+            },
+            {
+                id: 20, stage: 3, type: "fill",
+                q: "Một nhóm làm x mô hình A và y mô hình B. Mỗi A cần 2 tấm bìa, 1 giờ; mỗi B cần 1 tấm bìa, 2 giờ. Tối đa 12 tấm bìa, 12 giờ. Nếu làm 4 mô hình A (tức x = 4) thì làm được nhiều nhất [INPUT] mô hình B.",
+                ansNorms: ["4", "4.0", "4mohinh", "4mohinhb"], dispAns: "4",
+                exp: "2(4) + y ≤ 12 ➔ y ≤ 4; 4 + 2y ≤ 12 ➔ y ≤ 4. Nhiều nhất 4 mô hình B."
+            }
+        ];
+
+        let state = {
+            qIdx: 0, score: 0, stageScores: [0,0,0,0], perfects: 0,
+            timer: null, timeRem: 0, isTimed: false, locked: false,
+            mistakes: [], isReview: false, revList: [], revIdx: 0, name: "Ẩn danh",
+            graphStep: 0, graphMaxSteps: 0, graphData: null
+        };
+        let dndState = { selected: null };
+
+        const DOM = {
+            screens: {
+                start: document.getElementById('screen-start'),
+                game: document.getElementById('screen-game'),
+                stage: document.getElementById('screen-stage'),
+                final: document.getElementById('screen-final')
+            },
+            header: document.getElementById('game-header'),
+            nameIn: document.getElementById('input-name'),
+            qText: document.getElementById('question-text'),
+            qIdxLbl: document.getElementById('q-idx-label'),
+            ansArea: document.getElementById('answer-area'),
+            fb: document.getElementById('feedback-area'),
+            fbTitle: document.getElementById('fb-title'),
+            fbAns: document.getElementById('fb-ans'),
+            fbExp: document.getElementById('fb-exp'),
+            fbGraph: document.getElementById('fb-graph-container'),
+            svgWrap: document.getElementById('svg-wrapper'),
+            btnViewSteps: document.getElementById('btn-view-steps'),
+            graphNote: document.getElementById('graph-note'),
+            btnStart: document.getElementById('btn-start'),
+            btnCheck: document.getElementById('btn-check'),
+            btnNext: document.getElementById('btn-next'),
+            btnNextStage: document.getElementById('btn-next-stage'),
+            btnResetDnd: document.getElementById('btn-reset-dnd'),
+            btnReview: document.getElementById('btn-review'),
+            btnRestart: document.getElementById('btn-restart'),
+            displays: {
+                name: document.getElementById('player-display'),
+                stage: document.getElementById('stage-display'),
+                timer: document.getElementById('timer-display'),
+                timeVal: document.getElementById('time-val'),
+                score: document.getElementById('score-display'),
+                prog: document.getElementById('progress-bar'),
+                qNum: document.getElementById('q-num-display')
+            }
+        };
+
+        const utils = {
+            hideAll: () => Object.values(DOM.screens).forEach(el => el.classList.add('hidden')),
+            shuffle: (arr) => [...arr].sort(() => Math.random() - 0.5),
+            normStr: (s) => s.trim().toLowerCase().replace(/\s+/g, '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/,/g, '.')
+        };
+
+        DOM.btnStart.onclick = () => {
+            let n = DOM.nameIn.value.trim();
+            if(n) state.name = n;
+            state.isTimed = document.querySelector('input[name="mode"]:checked').value === 'timed';
+            resetState(); startGame();
+        };
+
+        DOM.btnRestart.onclick = () => { resetState(); startGame(); };
+
+        function resetState() {
+            state.qIdx = 0; state.score = 0; state.stageScores = [0,0,0,0]; state.perfects = 0;
+            state.mistakes = []; state.isReview = false; state.locked = false;
+        }
+
+        function startGame() {
+            utils.hideAll();
+            DOM.header.classList.remove('hidden');
+            DOM.displays.name.textContent = state.name;
+            DOM.displays.timer.classList.toggle('hidden', !state.isTimed);
+            DOM.screens.game.classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function updateTopBar() {
+            DOM.displays.score.textContent = Math.round(state.score);
+            let qArr = state.isReview ? state.revList : QUESTION_BANK;
+            let cIdx = state.isReview ? state.revIdx : state.qIdx;
+            DOM.displays.prog.style.width = state.isReview ? '100%' : `${((cIdx) / 20) * 100}%`;
+            DOM.displays.stage.textContent = state.isReview ? "Ôn tập" : STAGES[qArr[cIdx].stage];
+            DOM.displays.qNum.textContent = cIdx + 1;
+            DOM.qIdxLbl.textContent = cIdx + 1;
+        }
+
+        function startTimer() {
+            stopTimer();
+            state.timeRem = 90;
+            DOM.displays.timeVal.textContent = `${state.timeRem}s`;
+            DOM.displays.timer.classList.remove('text-danger');
+            state.timer = setInterval(() => {
+                state.timeRem--;
+                DOM.displays.timeVal.textContent = `${state.timeRem}s`;
+                if(state.timeRem <= 10) DOM.displays.timer.classList.add('text-danger');
+                if(state.timeRem <= 0) { stopTimer(); checkAnswer(true); }
+            }, 1000);
+        }
+
+        function stopTimer() { if(state.timer) { clearInterval(state.timer); state.timer = null; } }
+
+        function renderQuestion() {
+            state.locked = false;
+            DOM.fb.classList.add('hidden');
+            DOM.fbGraph.classList.add('hidden');
+            DOM.btnCheck.classList.remove('hidden');
+            DOM.btnNext.classList.add('hidden');
+            DOM.btnResetDnd.classList.add('hidden');
+            dndState.selected = null;
+
+            let q = state.isReview ? state.revList[state.revIdx].q : QUESTION_BANK[state.qIdx];
+            updateTopBar();
+            
+            if (q.type === 'fill') {
+                let html = q.q.replace('[INPUT]', `<input type="text" class="inp-fill w-20 bg-transparent border-b-2 border-gray-400 text-center text-gold font-bold text-lg outline-none focus:border-teal mx-1 px-1">`);
+                DOM.qText.innerHTML = html;
+                DOM.ansArea.innerHTML = `<div class="text-center text-gray-400 italic text-sm mt-8">Nhập đáp án vào chỗ trống phía trên.</div>`;
+                setTimeout(() => { let el = document.querySelector('.inp-fill'); if(el) el.focus(); }, 100);
+            } else {
+                DOM.qText.innerHTML = q.q;
+                if (q.type === 'mcq') {
+                    let opts = utils.shuffle(q.opts);
+                    let html = `<div class="flex flex-col gap-3 mt-4">`;
+                    opts.forEach(o => {
+                        html += `
+                        <label class="cursor-pointer">
+                            <input type="radio" name="mcq" value="${o.replace(/"/g, '&quot;')}" class="peer sr-only">
+                            <div class="p-4 rounded-xl border border-navy-lighter bg-navy-lighter peer-checked:border-teal peer-checked:bg-teal peer-checked:bg-opacity-10 transition-all flex gap-3 items-center hover:bg-gray-800">
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-500 peer-checked:border-teal flex items-center justify-center shrink-0">
+                                    <div class="w-2.5 h-2.5 bg-teal rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                </div>
+                                <div class="text-gray-200">${o}</div>
+                            </div>
+                        </label>`;
+                    });
+                    DOM.ansArea.innerHTML = html + `</div>`;
+                } 
+                else if (q.type === 'tf') {
+                    DOM.ansArea.innerHTML = `
+                    <div class="flex gap-4 max-w-sm mx-auto mt-6">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tf" value="Đúng" class="peer sr-only">
+                            <div class="p-6 text-center text-xl font-bold rounded-xl border border-navy-lighter bg-navy-lighter peer-checked:border-success peer-checked:bg-success peer-checked:bg-opacity-20 peer-checked:text-success hover:bg-gray-800 transition-all">ĐÚNG</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tf" value="Sai" class="peer sr-only">
+                            <div class="p-6 text-center text-xl font-bold rounded-xl border border-navy-lighter bg-navy-lighter peer-checked:border-danger peer-checked:bg-danger peer-checked:bg-opacity-20 peer-checked:text-danger hover:bg-gray-800 transition-all">SAI</div>
+                        </label>
+                    </div>`;
+                }
+                else if (q.type.startsWith('dnd')) {
+                    DOM.btnResetDnd.classList.remove('hidden');
+                    let items = utils.shuffle([...q.items]);
+                    let html = `<div class="text-xs text-center text-gray-400 italic mb-4">Chạm chọn thẻ ở kho, sau đó chạm ô trống để thả.</div>`;
+                    
+                    if (q.layout === 'sort') {
+                        html += `<div class="flex flex-col gap-2">`;
+                        q.targets.forEach((t, i) => {
+                            html += `<div class="flex gap-2 items-stretch"><div class="bg-navy px-3 py-2 rounded flex items-center justify-center font-bold text-gray-500 text-sm border border-navy-lighter">${i+1}</div><div class="dnd-slot flex-1 border-2 border-dashed border-gray-600 rounded bg-navy-lighter bg-opacity-50 p-2 min-h-[48px] cursor-pointer flex items-center" data-tgt="${t}"></div></div>`;
+                        });
+                        html += `</div>`;
+                    } else if (q.layout === 'list') {
+                        html += `<div class="flex flex-col gap-3">`;
+                        q.targets.forEach(t => {
+                            html += `<div class="flex flex-col md:flex-row gap-2 md:items-center bg-navy p-3 rounded-lg border border-navy-lighter">
+                                        <div class="md:w-1/2 text-sm text-gray-300 font-medium">${t}</div>
+                                        <div class="dnd-slot md:w-1/2 border-2 border-dashed border-gray-600 rounded bg-navy-lighter bg-opacity-50 p-2 min-h-[48px] cursor-pointer flex items-center" data-tgt="${t.replace(/"/g, '&quot;')}"></div>
+                                     </div>`;
+                        });
+                        html += `</div>`;
+                    } else if (q.type === 'dnd-group') {
+                        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+                        q.targets.forEach(t => {
+                            html += `<div class="bg-navy p-3 rounded-lg border border-navy-lighter flex flex-col gap-3">
+                                        <div class="text-center text-teal font-semibold text-sm border-b border-gray-700 pb-2">${t}</div>
+                                        <div class="flex flex-wrap gap-2 justify-center">`;
+                            for(let i=0; i<q.slotsPerGroup; i++) html += `<div class="dnd-slot w-24 border-2 border-dashed border-gray-600 rounded bg-navy-lighter bg-opacity-50 p-2 min-h-[48px] cursor-pointer flex items-center justify-center" data-tgt="${t}"></div>`;
+                            html += `</div></div>`;
+                        });
+                        html += `</div>`;
+                    }
+
+                    html += `
+                        <div class="mt-6 bg-navy-lighter p-4 rounded-xl border border-gray-700 shadow-inner">
+                            <div class="text-center text-xs font-bold text-gray-500 uppercase mb-3">Kho thẻ</div>
+                            <div class="flex flex-wrap gap-2 justify-center" id="dnd-pool">
+                                ${items.map(i => `<div class="dnd-item bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded shadow text-sm cursor-pointer border border-gray-600 text-center" data-val="${i.replace(/"/g, '&quot;')}">${i}</div>`).join('')}
+                            </div>
+                        </div>`;
+                    DOM.ansArea.innerHTML = html;
+                    initDND();
+                }
+            }
+
+            if (!state.isReview && state.isTimed) startTimer();
+        }
+
+        function initDND() {
+            const items = document.querySelectorAll('.dnd-item');
+            const slots = document.querySelectorAll('.dnd-slot');
+            const pool = document.getElementById('dnd-pool');
+
+            function clearSel() { if(dndState.selected) dndState.selected.classList.remove('selected'); dndState.selected = null; }
+
+            items.forEach(item => {
+                item.onclick = (e) => {
+                    if(state.locked) return; e.stopPropagation();
+                    if(dndState.selected === item) clearSel();
+                    else { clearSel(); dndState.selected = item; item.classList.add('selected'); }
+                };
+            });
+
+            slots.forEach(slot => {
+                slot.onclick = () => {
+                    if(state.locked || !dndState.selected) return;
+                    let sel = dndState.selected;
+                    if(slot.children.length > 0) {
+                        let ex = slot.children[0];
+                        sel.parentNode.appendChild(ex);
+                        slot.appendChild(sel);
+                    } else {
+                        slot.appendChild(sel);
+                    }
+                    clearSel();
+                };
+            });
+
+            pool.onclick = () => {
+                if(state.locked || !dndState.selected) return;
+                if(dndState.selected.parentNode !== pool) pool.appendChild(dndState.selected);
+                clearSel();
+            };
+
+            DOM.btnResetDnd.onclick = () => {
+                if(state.locked) return; clearSel();
+                document.querySelectorAll('.dnd-item').forEach(i => pool.appendChild(i));
+            };
+        }
+
+        DOM.btnCheck.onclick = () => checkAnswer(false);
+
+        function checkAnswer(isTimeout = false) {
+            if(state.locked) return;
+            let qArr = state.isReview ? state.revList : QUESTION_BANK;
+            let cIdx = state.isReview ? state.revIdx : state.qIdx;
+            let q = state.isReview ? qArr[cIdx].q : qArr[cIdx];
+
+            let pts = 0, isFull = false;
+
+            if (q.type === 'mcq') {
+                let rd = document.querySelector('input[name="mcq"]:checked');
+                if(!rd && !isTimeout) { alert("Em hãy chọn một phương án!"); return; }
+                state.locked = true;
+                if(rd && rd.value === q.ans) { pts = 10; isFull = true; }
+            } 
+            else if (q.type === 'tf') {
+                let rd = document.querySelector('input[name="tf"]:checked');
+                if(!rd && !isTimeout) { alert("Em hãy chọn Đúng hoặc Sai!"); return; }
+                state.locked = true;
+                if(rd && rd.value === q.ans) { pts = 10; isFull = true; }
+            }
+            else if (q.type === 'fill') {
+                let inp = document.querySelector('.inp-fill');
+                let val = inp.value;
+                if(val.trim() === '' && !isTimeout) { alert("Em hãy điền vào chỗ trống!"); return; }
+                state.locked = true; inp.disabled = true;
+                let norm = utils.normStr(val);
+                if(q.ansNorms.includes(norm)) {
+                    pts = 10; isFull = true;
+                    inp.classList.add('text-success', 'border-success'); inp.classList.remove('text-gold');
+                } else {
+                    inp.classList.add('text-danger', 'border-danger'); inp.classList.remove('text-gold');
+                }
+            }
+            else if (q.type.startsWith('dnd')) {
+                let slots = document.querySelectorAll('.dnd-slot');
+                let filled = Array.from(slots).filter(s => s.children.length > 0);
+                if(filled.length < slots.length && !isTimeout) { alert("Em hãy điền đủ thẻ!"); return; }
+                state.locked = true; DOM.btnResetDnd.classList.add('hidden');
+                document.querySelectorAll('.dnd-item').forEach(i => i.style.pointerEvents = 'none');
+
+                let corr = 0;
+                let totalReq = q.type === 'dnd' ? q.targets.length : Object.keys(q.correctGroups).reduce((a,k)=>a+q.slotsPerGroup,0);
+
+                if (q.type === 'dnd') {
+                    slots.forEach(s => {
+                        let tgt = s.getAttribute('data-tgt');
+                        if(s.children.length > 0) {
+                            let val = s.children[0].getAttribute('data-val');
+                            if(val === q.pairs[tgt]) { corr++; s.classList.add('border-success', 'bg-success', 'bg-opacity-20'); }
+                            else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                        } else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                    });
+                } else if (q.type === 'dnd-group') {
+                    slots.forEach(s => {
+                        let grp = s.getAttribute('data-tgt');
+                        if(s.children.length > 0) {
+                            let val = s.children[0].getAttribute('data-val');
+                            if(q.correctGroups[grp].includes(val)) { corr++; s.classList.add('border-success', 'bg-success', 'bg-opacity-20'); }
+                            else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                        } else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                    });
+                }
+                pts = (corr / totalReq) * 10;
+                if(corr === totalReq) isFull = true;
+            }
+
+            stopTimer();
+            if (!state.isReview) {
+                state.score += pts; state.stageScores[q.stage] += pts;
+                if(isFull) state.perfects++; else state.mistakes.push({q: q, pts: pts});
+                updateTopBar();
+            }
+            showFeedback(q, pts, isFull, isTimeout);
+        }
+
+        function showFeedback(q, pts, isFull, isTimeout) {
+            DOM.fb.classList.remove('hidden');
+            let cls = isFull ? 'bg-success bg-opacity-10 border-success' : (pts > 0 ? 'bg-gold bg-opacity-10 border-gold' : 'bg-danger bg-opacity-10 border-danger');
+            DOM.fb.className = `mb-6 p-4 rounded-xl border ${cls}`;
+            
+            let icon = isFull ? '🎉' : (pts > 0 ? '👍' : '💡');
+            let tText = isFull ? "Chính xác!" : (isTimeout ? "Hết giờ!" : "Em hãy xem lại...");
+            if(!state.isReview) tText += ` (+${Math.round(pts)} điểm)`;
+            else tText = isFull ? "🎉 Em nhớ bài rất tốt!" : "💡 Cần lưu ý hơn nhé!";
+            
+            DOM.fbTitle.innerHTML = `${icon} ${tText}`;
+            
+            let ansStr = "<strong>Đáp án đúng:</strong> ";
+            if(['mcq', 'tf'].includes(q.type)) ansStr += q.ans;
+            else if(q.type === 'fill') ansStr += `<span class="math-normal">${q.dispAns}</span>`;
+            else ansStr += "Xem giải thích hoặc cách xếp đúng bên trên.";
+            DOM.fbAns.innerHTML = ansStr;
+            DOM.fbExp.innerHTML = `<strong>Giải thích:</strong> ${q.exp}`;
+
+            if (q.graphReq) {
+                DOM.fbGraph.classList.remove('hidden');
+                setupGraphData(q.graphReq);
+                state.graphStep = state.graphMaxSteps;
+                renderGraph();
+                DOM.btnViewSteps.onclick = () => {
+                    state.graphStep = (state.graphStep + 1) % (state.graphMaxSteps + 1);
+                    if(state.graphStep === 0) state.graphStep = 1;
+                    renderGraph();
+                };
+            } else {
+                DOM.fbGraph.classList.add('hidden');
+            }
+
+            DOM.btnCheck.classList.add('hidden');
+            DOM.btnNext.classList.remove('hidden');
+            setTimeout(() => DOM.fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        }
+
+        function setupGraphData(req) {
+            let defs = `<marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8" /></marker>`;
+            let axes = `
+                <line x1="10" y1="160" x2="190" y2="160" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <line x1="40" y1="190" x2="40" y2="10" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <text x="185" y="175" fill="#94A3B8" font-size="10" font-style="italic">x</text>
+                <text x="25" y="15" fill="#94A3B8" font-size="10" font-style="italic">y</text>
+                <text x="30" y="175" fill="#94A3B8" font-size="10">O</text>
+            `;
+            const p = (x, y) => `${40 + x*20},${160 - y*20}`;
+            let data = { steps: [] };
+
+            if (req === "q4" || req === "q13") {
+                data.max = 3;
+                data.steps.push({
+                    els: `<line x1="40" y1="0" x2="40" y2="200" stroke="#EF4444" stroke-width="2"/>
+                          <line x1="0" y1="160" x2="200" y2="160" stroke="#3B82F6" stroke-width="2"/>
+                          <line x1="${p(-2,6).split(',')[0]}" y1="${p(-2,6).split(',')[1]}" x2="${p(6,-2).split(',')[0]}" y2="${p(6,-2).split(',')[1]}" stroke="#F59E0B" stroke-width="2"/>
+                          <text x="130" y="70" fill="#F59E0B" font-size="10">x + y = 4</text>`
+                });
+                data.steps.push({
+                    els: `<polygon points="${p(0,-2)} ${p(8,-2)} ${p(8,8)} ${p(0,8)}" fill="rgba(239, 68, 68, 0.1)"/>
+                          <polygon points="${p(-2,0)} ${p(8,0)} ${p(8,8)} ${p(-2,8)}" fill="rgba(59, 130, 246, 0.1)"/>
+                          <polygon points="${p(-2,6)} ${p(-2,-2)} ${p(6,-2)}" fill="rgba(245, 158, 11, 0.1)"/>` + data.steps[0].els
+                });
+                data.steps.push({
+                    els: `<polygon points="${p(0,0)} ${p(4,0)} ${p(0,4)}" fill="rgba(16, 185, 129, 0.5)"/>
+                          <text x="${p(4, -0.5).split(',')[0]}" y="${p(4, -0.5).split(',')[1]}" fill="#10B981" font-size="10">A(4;0)</text>
+                          <text x="${p(-0.5, 4).split(',')[0]}" y="${p(-0.5, 4).split(',')[1]}" fill="#10B981" font-size="10">B(0;4)</text>` + data.steps[0].els
+                });
+            } else {
+                data.max = 1;
+                data.steps.push({
+                    els: `<polygon points="${p(0,0)} ${p(3,0)} ${p(0,3)}" fill="rgba(16, 185, 129, 0.5)"/>`
+                });
+            }
+
+            state.graphData = { defs, axes, steps: data.steps };
+            state.graphMaxSteps = data.max;
+        }
+
+        function renderGraph() {
+            if(!state.graphData) return;
+            let stepData = state.graphData.steps[state.graphStep - 1];
+            DOM.svgWrap.innerHTML = `
+                <svg viewBox="0 0 200 200" width="100%" height="auto">
+                    <defs>${state.graphData.defs}</defs>
+                    ${state.graphData.axes}
+                    ${stepData.els}
+                </svg>
+            `;
+            DOM.btnViewSteps.textContent = state.graphStep === state.graphMaxSteps ? "Vẽ lại từ đầu" : `Tiếp tục (Bước ${state.graphStep}/${state.graphMaxSteps})`;
+        }
+
+        DOM.btnNext.onclick = () => {
+            if (state.isReview) {
+                state.revIdx++;
+                if (state.revIdx < state.revList.length) renderQuestion();
+                else showFinal();
+                return;
+            }
+
+            let cStg = QUESTION_BANK[state.qIdx].stage;
+            state.qIdx++;
+
+            if (state.qIdx < QUESTION_BANK.length) {
+                if (QUESTION_BANK[state.qIdx].stage !== cStg) {
+                    utils.hideAll(); DOM.screens.stage.classList.remove('hidden');
+                    document.getElementById('stage-name-summary').textContent = STAGES[cStg];
+                    document.getElementById('stage-score-summary').textContent = `${Math.round(state.stageScores[cStg])}/50`;
+                } else renderQuestion();
+            } else showFinal();
+        };
+
+        DOM.btnNextStage.onclick = () => {
+            utils.hideAll(); DOM.screens.game.classList.remove('hidden'); renderQuestion();
+        };
+
+        function showFinal() {
+            utils.hideAll();
+            DOM.header.classList.add('hidden');
+            DOM.screens.final.classList.remove('hidden');
+
+            document.getElementById('final-name').textContent = state.name;
+            document.getElementById('final-score').textContent = `${Math.round(state.score)} / 200`;
+            document.getElementById('final-perfect').textContent = `${state.perfects} / 20`;
+
+            let bd = "";
+            STAGES.forEach((s, i) => bd += `<div class="flex justify-between"><span class="text-gray-400">${s}</span><span class="text-gold font-bold">${Math.round(state.stageScores[i])}/50</span></div>`);
+            document.getElementById('final-breakdown').innerHTML = bd;
+
+            let adv = document.getElementById('final-advice');
+            if (state.mistakes.length > 0) {
+                adv.innerHTML = "💡 <strong>Nhận xét:</strong> Em hãy cẩn thận kiểm tra <em>đồng thời</em> các điều kiện khi giải hệ nhé. Chú ý phân biệt đường nét liền và nét đứt.";
+                adv.classList.remove('hidden');
+                document.getElementById('review-container').classList.remove('hidden');
+                DOM.btnReview.classList.remove('hidden');
+                let rl = "";
+                state.mistakes.forEach(m => rl += `<div class="bg-navy p-3 rounded-lg border border-gray-700 text-gray-300 text-sm"><strong>Câu ${m.q.id}:</strong> ${m.q.q.replace(/<input[^>]*>/, '___')}</div>`);
+                document.getElementById('review-list').innerHTML = rl;
+            } else {
+                adv.innerHTML = "🏆 <strong>Tuyệt vời!</strong> Em đã làm chủ hoàn toàn kiến thức về hệ bất phương trình bậc nhất hai ẩn!";
+                adv.classList.remove('hidden');
+                document.getElementById('review-container').classList.add('hidden');
+                DOM.btnReview.classList.add('hidden');
+            }
+        }
+
+        DOM.btnReview.onclick = () => {
+            state.isReview = true; state.revList = [...state.mistakes]; state.revIdx = 0;
+            utils.hideAll(); DOM.header.classList.remove('hidden'); DOM.screens.game.classList.remove('hidden');
+            DOM.displays.timer.classList.add('hidden'); renderQuestion();
+        };
+    </script>
+</body>
+</html>

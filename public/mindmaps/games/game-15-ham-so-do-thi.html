@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Khám Phá Cỗ Máy Hàm Số & Đồ Thị - Toán 10</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0A192F',
+            'navy-light': '#112240',
+            'navy-lighter': '#233554',
+            teal: '#64FFDA',
+            gold: '#FBBF24',
+            danger: '#EF4444',
+            success: '#10B981',
+            accent: '#06B6D4'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            math: ['"Times New Roman"', 'Times', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0A192F; color: #E2E8F0; font-family: 'Inter', sans-serif; user-select: none; }
+    .math { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: italic; }
+    .math-normal { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: normal; }
+    .vec { display: inline-block; position: relative; font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: bold; padding-top: 0.3em; margin: 0 0.15em; }
+    .vec::after { content: '→'; position: absolute; top: -0.6em; left: 50%; transform: translateX(-50%); font-style: normal; font-weight: normal; font-size: 0.85em; }
+    .btn-opt { transition: all 0.15s ease; }
+    .btn-opt:hover { transform: translateY(-2px); border-color: #06B6D4; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-teal selection:text-navy">
+  <!-- Header -->
+  <header class="bg-navy-light/95 border-b border-navy-lighter px-4 py-3 sticky top-0 z-20 backdrop-blur-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          Chương 3: Hàm Số & Đồ Thị
+        </span>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-white leading-tight">Khám Phá Cỗ Máy Hàm Số & Đồ Thị</h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Tập xác định, tập giá trị, tính đồng biến & nghịch biến</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-right">
+        <div>
+          <span class="text-[11px] text-slate-400 block">Điểm số</span>
+          <span id="score-val" class="text-lg font-black text-gold">0</span>
+        </div>
+        <div>
+          <span class="text-[11px] text-slate-400 block">Câu hỏi</span>
+          <span id="q-counter" class="text-sm font-bold text-teal">1 / 8</span>
+        </div>
+      </div>
+    </div>
+    <!-- Progress bar -->
+    <div class="max-w-4xl mx-auto mt-2 h-1.5 bg-navy-lighter rounded-full overflow-hidden">
+      <div id="progress-fill" class="h-full bg-gradient-to-r from-teal to-gold transition-all duration-300" style="width: 0%"></div>
+    </div>
+  </header>
+
+  <!-- Main Game Stage -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+    <!-- Intro / Start Screen -->
+    <div id="intro-screen" class="bg-navy-light border border-navy-lighter rounded-2xl p-6 sm:p-8 text-center max-w-2xl mx-auto shadow-2xl">
+      <div class="w-16 h-16 rounded-2xl bg-teal/10 border border-teal/30 text-teal flex items-center justify-center text-3xl mx-auto mb-4">
+        🎮
+      </div>
+      <h2 class="text-2xl font-black text-white mb-2">Khám Phá Cỗ Máy Hàm Số & Đồ Thị</h2>
+      <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+        Tập xác định, tập giá trị, tính đồng biến & nghịch biến. Hoàn thành 8 thử thách với 4 chặng thi đấu để đạt danh hiệu Đại Kiện Tướng Toán Học!
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 text-left">
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 1</span>
+            <span class="text-xs font-semibold text-slate-200">Tập xác định D</span>
+          </div>
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 2</span>
+            <span class="text-xs font-semibold text-slate-200">Tính giá trị hàm số</span>
+          </div>
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 3</span>
+            <span class="text-xs font-semibold text-slate-200">Đồng biến & Nghịch biến</span>
+          </div>
+        
+          <div class="p-3 rounded-xl bg-navy/60 border border-navy-lighter">
+            <span class="text-[10px] text-gold font-bold uppercase block">Chặng 4</span>
+            <span class="text-xs font-semibold text-slate-200">Đọc đồ thị Oxy</span>
+          </div>
+        
+      </div>
+      <button id="btn-start" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-teal to-emerald-400 text-navy font-black text-base shadow-lg shadow-teal/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+        🚀 BẮT ĐẦU THỬ THÁCH NGAY
+      </button>
+    </div>
+
+    <!-- Question Card -->
+    <div id="game-stage" class="hidden flex-col gap-5">
+      <div class="bg-navy-light border border-navy-lighter rounded-2xl p-5 sm:p-7 shadow-xl">
+        <!-- Stage & Tag -->
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-navy-lighter text-xs">
+          <span id="stage-badge" class="px-2.5 py-1 rounded-md bg-gold/10 text-gold font-bold border border-gold/20">
+            Chặng 1
+          </span>
+          <span id="q-hint-topic" class="text-slate-400">Toán 10 GDPT 2018</span>
+        </div>
+
+        <!-- Question Title -->
+        <div id="q-content" class="text-base sm:text-lg font-bold text-white mb-5 leading-relaxed">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Question Graphic / SVG Area (optional) -->
+        <div id="q-graphic" class="mb-5 hidden bg-slate-950/60 rounded-xl p-4 border border-navy-lighter flex justify-center items-center overflow-x-auto">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Options Container -->
+        <div id="options-box" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Feedback & Explanation Box -->
+        <div id="feedback-box" class="mt-5 p-4 rounded-xl hidden border">
+          <div id="feedback-title" class="font-bold text-sm mb-1"></div>
+          <div id="feedback-detail" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></div>
+          <div class="mt-4 flex justify-end">
+            <button id="btn-next" class="px-6 py-2.5 rounded-xl bg-gold text-navy font-bold text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all cursor-pointer">
+              Tiếp tục thử thách ➔
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Result Screen -->
+    <div id="result-screen" class="hidden bg-navy-light border border-navy-lighter rounded-2xl p-6 sm:p-8 text-center max-w-2xl mx-auto shadow-2xl">
+      <div id="result-medal" class="text-5xl mb-3">🏆</div>
+      <h2 class="text-2xl font-black text-white mb-1">KẾT QUẢ THỬ THÁCH</h2>
+      <p id="result-rank" class="text-sm font-bold text-teal mb-4">Đại Kiện Tướng Toán Học</p>
+      <div class="bg-navy/70 border border-navy-lighter rounded-xl p-4 mb-6 grid grid-cols-2 gap-4">
+        <div>
+          <span class="text-xs text-slate-400 block">Tổng điểm đạt được</span>
+          <span id="final-score" class="text-2xl font-black text-gold">0 / 100</span>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 block">Số câu chính xác</span>
+          <span id="final-correct" class="text-2xl font-black text-emerald-400">0 / 0</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button id="btn-restart" class="px-6 py-3 rounded-xl bg-teal text-navy font-bold text-sm hover:brightness-110 active:scale-95 transition-all cursor-pointer">
+          🔄 Thử thách lại
+        </button>
+        
+      </div>
+    </div>
+
+    
+  </main>
+
+  <footer class="py-3 text-center text-xs text-slate-500 border-t border-navy-lighter">
+    Học Liệu Số Toán 10 · Khám Phá Toán Học Tương Tác
+  </footer>
+
+  <script>
+    const QUESTIONS = [{"stage":1,"question":"Tập xác định của hàm số y = √(x - 3) là:","options":[{"label":"D = [3; +∞)"},{"label":"D = (3; +∞)"},{"label":"D = (-∞; 3]"},{"label":"D = R \\ {3}"}],"correct":0,"explanation":"Biểu thức dưới dấu căn có nghĩa khi x - 3 ≥ 0 ⇔ x ≥ 3. Vậy tập xác định là D = [3; +∞)."},{"stage":1,"question":"Tập xác định của hàm số y = 1 / (x - 2) là:","options":[{"label":"D = R \\ {2}"},{"label":"D = [2; +∞)"},{"label":"D = (2; +∞)"},{"label":"D = R"}],"correct":0,"explanation":"Mẫu thức phải khác 0: x - 2 ≠ 0 ⇔ x ≠ 2. Do đó D = R \\ {2}."},{"stage":2,"question":"Cho hàm số f(x) = 2x² - 3x + 1. Giá trị f(-1) bằng:","options":[{"label":"f(-1) = 6"},{"label":"f(-1) = 0"},{"label":"f(-1) = 4"},{"label":"f(-1) = -4"}],"correct":0,"explanation":"f(-1) = 2·(-1)² - 3·(-1) + 1 = 2·1 + 3 + 1 = 6."},{"stage":2,"question":"Hàm số y = f(x) được gọi là đồng biến trên khoảng (a; b) nếu với mọi x₁, x₂ thuộc (a; b):","options":[{"label":"x₁ < x₂ ⇒ f(x₁) < f(x₂)"},{"label":"x₁ < x₂ ⇒ f(x₁) > f(x₂)"},{"label":"x₁ < x₂ ⇒ f(x₁) = f(x₂)"},{"label":"f(x) luôn mang giá trị dương"}],"correct":0,"explanation":"Đồng biến (tăng) nghĩa là khi x tăng thì giá trị y = f(x) cũng tăng: x₁ < x₂ ⇒ f(x₁) < f(x₂)."},{"stage":3,"question":"Hàm số bậc nhất y = -3x + 5 có tính chất biến thiên nào?","options":[{"label":"Nghịch biến trên R (vì hệ số a = -3 < 0)"},{"label":"Đồng biến trên R"},{"label":"Đồng biến trên (0; +∞)"},{"label":"Không tăng không giảm"}],"correct":0,"explanation":"Hàm số bậc nhất y = ax + b có hệ số a = -3 < 0 nên nghịch biến trên toàn bộ tập R."},{"stage":3,"question":"Đồ thị hàm số y = f(x) đi lên từ trái sang phải trên khoảng nào chứng tỏ hàm số:","options":[{"label":"Đồng biến trên khoảng đó"},{"label":"Nghịch biến trên khoảng đó"},{"label":"Có giá trị âm"},{"label":"Không xác định"}],"correct":0,"explanation":"Khi nhìn từ trái sang phải dọc theo trục Ox (x tăng dần), đồ thị đi lên nghĩa là y tăng dần theo x, tức là hàm số đồng biến."},{"stage":4,"question":"Tập xác định của hàm số y = √(x + 1) / (x - 4) là:","options":[{"label":"D = [-1; +∞) \\ {4}"},{"label":"D = (-1; +∞)"},{"label":"D = [4; +∞)"},{"label":"D = R \\ {4}"}],"correct":0,"explanation":"Điều kiện: x + 1 ≥ 0 và x - 4 ≠ 0 ⇔ x ≥ -1 và x ≠ 4. Vậy D = [-1; +∞) \\ {4}."},{"stage":4,"question":"Điểm nào sau đây thuộc đồ thị hàm số y = 3x - 2?","options":[{"label":"M(2; 4)"},{"label":"N(1; 2)"},{"label":"P(0; 2)"},{"label":"Q(-1; 1)"}],"correct":0,"explanation":"Thay x = 2 vào hàm số: y = 3·2 - 2 = 6 - 2 = 4. Vậy điểm M(2; 4) thuộc đồ thị."}];
+    const STAGES = ["Tập xác định D","Tính giá trị hàm số","Đồng biến & Nghịch biến","Đọc đồ thị Oxy"];
+
+    let currentQ = 0;
+    let score = 0;
+    let correctCount = 0;
+    let answered = false;
+
+    const DOM = {
+      intro: document.getElementById('intro-screen'),
+      stage: document.getElementById('game-stage'),
+      result: document.getElementById('result-screen'),
+      lab: document.getElementById('lab-screen'),
+      btnStart: document.getElementById('btn-start'),
+      btnRestart: document.getElementById('btn-restart'),
+      btnOpenLab: document.getElementById('btn-open-lab'),
+      btnCloseLab: document.getElementById('btn-close-lab'),
+      scoreVal: document.getElementById('score-val'),
+      qCounter: document.getElementById('q-counter'),
+      progressFill: document.getElementById('progress-fill'),
+      stageBadge: document.getElementById('stage-badge'),
+      qContent: document.getElementById('q-content'),
+      qGraphic: document.getElementById('q-graphic'),
+      optionsBox: document.getElementById('options-box'),
+      feedbackBox: document.getElementById('feedback-box'),
+      feedbackTitle: document.getElementById('feedback-title'),
+      feedbackDetail: document.getElementById('feedback-detail'),
+      btnNext: document.getElementById('btn-next'),
+      finalScore: document.getElementById('final-score'),
+      finalCorrect: document.getElementById('final-correct'),
+      resultRank: document.getElementById('result-rank')
+    };
+
+    DOM.btnStart.onclick = () => {
+      DOM.intro.classList.add('hidden');
+      DOM.stage.classList.remove('hidden');
+      DOM.stage.classList.add('flex');
+      loadQuestion(0);
+    };
+
+    DOM.btnRestart.onclick = () => {
+      currentQ = 0;
+      score = 0;
+      correctCount = 0;
+      DOM.scoreVal.textContent = '0';
+      DOM.result.classList.add('hidden');
+      DOM.stage.classList.remove('hidden');
+      DOM.stage.classList.add('flex');
+      loadQuestion(0);
+    };
+
+    if (DOM.btnOpenLab) {
+      DOM.btnOpenLab.onclick = () => {
+        DOM.result.classList.add('hidden');
+        DOM.lab.classList.remove('hidden');
+        if (typeof initLab === 'function') initLab();
+      };
+      DOM.btnCloseLab.onclick = () => {
+        DOM.lab.classList.add('hidden');
+        DOM.result.classList.remove('hidden');
+      };
+    }
+
+    function loadQuestion(idx) {
+      currentQ = idx;
+      answered = false;
+      const q = QUESTIONS[idx];
+      DOM.qCounter.textContent = (idx + 1) + ' / ' + QUESTIONS.length;
+      DOM.progressFill.style.width = ((idx / QUESTIONS.length) * 100) + '%';
+      DOM.stageBadge.textContent = 'Chặng ' + (q.stage || Math.floor(idx / 3) + 1) + ': ' + (STAGES[q.stage - 1] || 'Vận dụng');
+      DOM.qContent.innerHTML = q.question;
+
+      if (q.graphicSvg) {
+        DOM.qGraphic.innerHTML = q.graphicSvg;
+        DOM.qGraphic.classList.remove('hidden');
+      } else {
+        DOM.qGraphic.classList.add('hidden');
+      }
+
+      DOM.feedbackBox.classList.add('hidden');
+      DOM.optionsBox.innerHTML = '';
+
+      q.options.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-opt text-left p-4 rounded-xl bg-navy border border-navy-lighter hover:bg-navy-lighter text-sm sm:text-base font-semibold text-slate-200 cursor-pointer flex items-center justify-between gap-3';
+        btn.innerHTML = '<span>' + opt.label + '</span><span class="w-6 h-6 rounded-lg bg-navy-lighter flex items-center justify-center text-xs text-slate-400 font-bold">' + String.fromCharCode(65 + optIdx) + '</span>';
+        btn.onclick = () => handleAnswer(optIdx, btn);
+        DOM.optionsBox.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIdx, clickedBtn) {
+      if (answered) return;
+      answered = true;
+      const q = QUESTIONS[currentQ];
+      const isCorrect = selectedIdx === q.correct;
+      const allBtns = DOM.optionsBox.querySelectorAll('button');
+
+      allBtns.forEach((b, i) => {
+        b.disabled = true;
+        b.classList.remove('hover:bg-navy-lighter');
+        if (i === q.correct) {
+          b.classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300');
+        } else if (i === selectedIdx && !isCorrect) {
+          b.classList.add('bg-rose-950/80', 'border-rose-500', 'text-rose-300');
+        }
+      });
+
+      if (isCorrect) {
+        score += 10;
+        correctCount++;
+        DOM.scoreVal.textContent = score;
+        DOM.feedbackBox.className = 'mt-5 p-4 rounded-xl border border-emerald-500/50 bg-emerald-950/30 text-emerald-200 fade-in';
+        DOM.feedbackTitle.textContent = '🎉 CHÍNH XÁC! (+10 ĐIỂM)';
+      } else {
+        DOM.feedbackBox.className = 'mt-5 p-4 rounded-xl border border-rose-500/50 bg-rose-950/30 text-rose-200 fade-in';
+        DOM.feedbackTitle.textContent = '💡 CHƯA CHÍNH XÁC!';
+      }
+
+      DOM.feedbackDetail.innerHTML = q.explanation || 'Đáp án đúng là: ' + q.options[q.correct].label;
+      DOM.feedbackBox.classList.remove('hidden');
+    }
+
+    DOM.btnNext.onclick = () => {
+      if (currentQ + 1 < QUESTIONS.length) {
+        loadQuestion(currentQ + 1);
+      } else {
+        showResults();
+      }
+    };
+
+    function showResults() {
+      DOM.stage.classList.add('hidden');
+      DOM.stage.classList.remove('flex');
+      DOM.result.classList.remove('hidden');
+      DOM.progressFill.style.width = '100%';
+      DOM.finalScore.textContent = score + ' / ' + (QUESTIONS.length * 10);
+      DOM.finalCorrect.textContent = correctCount + ' / ' + QUESTIONS.length;
+
+      const pct = (correctCount / QUESTIONS.length) * 100;
+      if (pct >= 90) {
+        DOM.resultRank.textContent = '🌟 ĐẠI KIỆN TƯỚNG TOÁN HỌC (XUẤT SẮC)';
+      } else if (pct >= 70) {
+        DOM.resultRank.textContent = '🥈 BẬC THẦY TƯ DUY (KHÁ GIỎI)';
+      } else {
+        DOM.resultRank.textContent = '🥉 CHIẾN BINH TIỀM NĂNG (CẦN ÔN TẬP THÊM)';
+      }
+    }
+
+    
+  </script>
+</body>
+</html>

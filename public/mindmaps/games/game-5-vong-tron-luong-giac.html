@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Giải Mã Vòng Tròn Lượng Giác</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0A192F',
+                        'navy-light': '#112240',
+                        'navy-lighter': '#233554',
+                        teal: '#64FFDA',
+                        gold: '#FBBF24',
+                        danger: '#EF4444',
+                        success: '#10B981'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        math: ['"Times New Roman"', 'Times', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0A192F; color: #E2E8F0; overscroll-behavior-y: none; font-family: 'Inter', sans-serif;}
+        .math { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: italic; letter-spacing: 0.5px;}
+        .math-normal { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: normal; }
+        .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 0.2em; font-size: 0.9em;}
+        .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 0.1em; }
+        .frac > span:last-child { padding: 0 0.1em; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .dnd-item { transition: all 0.2s; user-select: none; touch-action: none; }
+        .dnd-item:active { transform: scale(0.95); }
+        .dnd-item.selected { border-color: #FBBF24 !important; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); background-color: #1E293B !important; transform: translateY(-2px); }
+        .btn-action { transition: transform 0.1s, filter 0.2s; }
+        .btn-action:active { transform: scale(0.95); }
+        .btn-action:hover { filter: brightness(1.1); }
+        .graph-container { background-color: #F8FAFC; border-radius: 8px; border: 2px solid #233554; overflow: hidden; position: relative;}
+        .graph-label { font-family: 'Times New Roman', serif; font-size: 14px; fill: #1E293B;}
+        .inp-fill {
+            background-color: transparent; border: none; border-bottom: 2px solid #94A3B8; color: #FBBF24;
+            text-align: center; font-size: 1.1em; font-weight: bold; width: 60px; outline: none; transition: border-color 0.2s;
+            font-family: 'Times New Roman', serif;
+        }
+        .inp-fill:focus { border-color: #64FFDA; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #64FFDA; cursor: pointer; margin-top: -8px; box-shadow: 0 0 5px rgba(100,255,218,0.5);}
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #475569; border-radius: 2px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-teal selection:text-navy">
+    <header id="game-header" class="bg-navy-light shadow-md border-b border-navy-lighter p-3 sticky top-0 z-20 hidden">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <span id="player-display" class="font-bold text-teal truncate max-w-[120px] md:max-w-[200px]">Người chơi</span>
+                <span id="stage-display" class="font-semibold text-gold bg-navy-lighter px-3 py-1 rounded-full text-xs md:text-sm">Chặng 1</span>
+            </div>
+            <div class="flex items-center justify-between w-full md:w-auto gap-4">
+                <div class="text-xs text-gray-400">Câu <span id="q-num-display" class="text-white font-bold text-sm">1</span>/20</div>
+                <div id="timer-display" class="font-mono font-bold text-teal hidden px-2 py-1 bg-navy-lighter rounded flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="time-val">60s</span>
+                </div>
+                <div class="font-bold text-sm bg-navy px-3 py-1 rounded-lg border border-navy-lighter">
+                    Điểm: <span id="score-display" class="text-gold text-lg">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-4xl mx-auto mt-2 bg-navy-lighter h-1.5 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-teal to-gold h-full w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-3 md:p-6 w-full max-w-4xl mx-auto relative">
+        <div id="screen-start" class="w-full max-w-md bg-navy-light p-6 md:p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-navy-lighter fade-in mt-4 md:mt-0">
+            <div class="flex justify-center mb-4">
+                <div class="p-3 bg-teal bg-opacity-10 rounded-full">
+                    <svg class="w-12 h-12 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                </div>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-teal to-gold mb-3 leading-tight">
+                GIẢI MÃ VÒNG TRÒN LƯỢNG GIÁC
+            </h1>
+            <p class="text-gray-300 text-center mb-6 text-sm">Khám phá giá trị lượng giác của các góc từ 0° đến 180° qua 20 câu hỏi thử thách!</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Tên người chơi / Đội</label>
+                    <input type="text" id="input-name" class="w-full bg-navy-lighter border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal" placeholder="Nhập tên của bạn...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Chế độ chơi</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="mode" value="normal" class="peer sr-only" checked>
+                            <div class="text-center p-3 border border-gray-600 rounded-lg peer-checked:border-teal peer-checked:bg-teal peer-checked:bg-opacity-10 peer-checked:text-teal transition-all text-sm font-medium">Không giới hạn</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="mode" value="timed" class="peer sr-only">
+                            <div class="text-center p-3 border border-gray-600 rounded-lg peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 peer-checked:text-gold transition-all text-sm font-medium">60s / Câu</div>
+                        </label>
+                    </div>
+                </div>
+                <button id="btn-start" class="w-full bg-teal text-navy font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(100,255,218,0.3)] hover:bg-emerald-400 btn-action text-lg mt-2">BẮT ĐẦU NGAY</button>
+            </div>
+        </div>
+
+        <div id="screen-game" class="w-full hidden fade-in py-2">
+            <div class="bg-navy-light rounded-2xl p-4 md:p-6 lg:p-8 shadow-xl border border-navy-lighter">
+                <div class="mb-6">
+                    <div class="flex items-start gap-2">
+                        <div class="bg-navy border border-gray-600 text-gray-400 px-2 py-1 rounded text-xs font-bold mt-1 whitespace-nowrap">CÂU <span id="q-idx-label"></span></div>
+                        <div id="question-text" class="text-lg md:text-xl font-medium leading-relaxed text-gray-100 flex-1">Nội dung câu hỏi</div>
+                    </div>
+                </div>
+                <div id="answer-area" class="mb-6 min-h-[150px]"></div>
+                <div id="feedback-area" class="hidden mb-6 p-4 rounded-xl border">
+                    <div id="fb-title" class="font-bold text-lg mb-2 flex items-center gap-2"></div>
+                    <div id="fb-ans" class="text-gray-200 mb-2 p-3 bg-navy-lighter rounded-lg text-sm md:text-base border border-gray-700"></div>
+                    <div id="fb-exp" class="text-gray-300 text-sm md:text-base leading-relaxed"></div>
+                    <div id="fb-graph-container" class="hidden mt-4">
+                        <div class="font-semibold text-teal text-sm mb-2">Minh họa trên nửa đường tròn đơn vị</div>
+                        <div class="graph-container flex justify-center p-2 md:p-4 bg-white">
+                            <div id="svg-wrapper" class="w-full max-w-[400px]"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mt-6 border-t border-navy-lighter pt-4">
+                    <button id="btn-reset-dnd" class="hidden px-4 py-2 rounded-lg text-sm bg-navy border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">Xếp lại thẻ</button>
+                    <div class="flex-grow"></div>
+                    <button id="btn-check" class="px-8 py-3 rounded-xl font-bold bg-teal text-navy btn-action shadow-lg hover:bg-emerald-400">Kiểm tra</button>
+                    <button id="btn-next" class="hidden px-8 py-3 rounded-xl font-bold bg-gold text-navy btn-action shadow-lg hover:bg-yellow-400">Câu tiếp theo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-stage" class="w-full max-w-sm text-center hidden fade-in mt-10">
+            <div class="bg-navy-light p-8 rounded-2xl border border-navy-lighter shadow-2xl">
+                <div class="w-16 h-16 mx-auto bg-teal bg-opacity-20 text-teal rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h2 class="text-xl text-gray-300 mb-1">Hoàn thành chặng</h2>
+                <h3 id="stage-name-summary" class="text-2xl text-gold font-bold mb-6">Tên chặng</h3>
+                <div class="bg-navy-lighter p-4 rounded-xl mb-6">
+                    <div class="text-gray-400 text-sm mb-1">Điểm chặng này</div>
+                    <div id="stage-score-summary" class="text-4xl font-bold text-teal">50/50</div>
+                </div>
+                <button id="btn-next-stage" class="w-full bg-teal text-navy font-bold py-3 rounded-xl btn-action">Tiếp tục hành trình</button>
+            </div>
+        </div>
+
+        <div id="screen-final" class="w-full max-w-2xl hidden fade-in py-6">
+            <div class="bg-navy-light p-6 md:p-8 rounded-2xl border border-navy-lighter shadow-2xl">
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal to-gold mb-2 uppercase">GIẢI MÃ THÀNH CÔNG!</h1>
+                    <p id="final-name" class="text-lg text-gray-300"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-navy-lighter p-4 rounded-xl text-center border border-gray-700">
+                        <div class="text-gray-400 text-sm mb-1">Tổng điểm</div>
+                        <div id="final-score" class="text-3xl md:text-4xl font-bold text-gold"></div>
+                    </div>
+                    <div class="bg-navy-lighter p-4 rounded-xl text-center border border-gray-700">
+                        <div class="text-gray-400 text-sm mb-1">Số câu trọn vẹn</div>
+                        <div id="final-perfect" class="text-3xl md:text-4xl font-bold text-teal"></div>
+                    </div>
+                </div>
+                <div class="bg-navy p-4 rounded-xl border border-gray-700 mb-6">
+                    <h3 class="font-bold mb-3 border-b border-gray-600 pb-2 text-gray-200">Điểm từng chặng</h3>
+                    <div id="final-breakdown" class="space-y-2 text-sm md:text-base"></div>
+                </div>
+                <div id="final-advice" class="text-center bg-navy-lighter p-4 rounded-xl border-l-4 border-teal mb-6 text-sm md:text-base leading-relaxed text-gray-200 hidden"></div>
+                <div id="review-section" class="hidden mb-6">
+                    <h3 class="font-bold text-danger mb-3 flex items-center gap-2">Các câu cần xem lại</h3>
+                    <div id="review-list" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="btn-review" class="hidden px-6 py-3 rounded-xl font-bold bg-navy border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">Ôn câu sai</button>
+                    <button id="btn-explore" class="px-6 py-3 rounded-xl font-bold bg-navy border border-teal text-teal hover:bg-teal hover:bg-opacity-10 transition-colors">Khám phá góc</button>
+                    <button id="btn-restart" class="px-8 py-3 rounded-xl font-bold bg-teal text-navy btn-action shadow-lg hover:bg-emerald-400">Chơi lại từ đầu</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-explore" class="w-full max-w-2xl hidden fade-in py-6">
+            <div class="bg-navy-light p-6 md:p-8 rounded-2xl border border-navy-lighter shadow-2xl relative">
+                <button id="btn-close-explore" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+                <h2 class="text-2xl font-bold text-teal mb-4 text-center">Khám Phá Vòng Tròn Lượng Giác</h2>
+                <div class="graph-container flex justify-center p-4 bg-white mb-6">
+                    <div id="explore-svg-wrapper" class="w-full max-w-[400px]"></div>
+                </div>
+                <div class="bg-navy p-4 rounded-xl border border-gray-700 mb-6">
+                    <label class="text-gray-300 font-medium text-sm">Góc α: <span id="explore-angle-val" class="font-bold text-lg text-white">45°</span></label>
+                    <input type="range" id="explore-slider" min="0" max="180" value="45" step="1" class="w-full">
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="bg-navy-lighter p-3 rounded-lg border border-gray-600"><div class="text-xs text-gray-400 mb-1 math-normal">sin α</div><div id="val-sin" class="font-bold text-white"></div></div>
+                    <div class="bg-navy-lighter p-3 rounded-lg border border-gray-600"><div class="text-xs text-gray-400 mb-1 math-normal">cos α</div><div id="val-cos" class="font-bold text-white"></div></div>
+                    <div class="bg-navy-lighter p-3 rounded-lg border border-gray-600"><div class="text-xs text-gray-400 mb-1 math-normal">tan α</div><div id="val-tan" class="font-bold text-white"></div></div>
+                    <div class="bg-navy-lighter p-3 rounded-lg border border-gray-600"><div class="text-xs text-gray-400 mb-1 math-normal">cot α</div><div id="val-cot" class="font-bold text-white"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-xs text-gray-500 w-full bg-navy mt-auto border-t border-navy-light">
+        <p>Học Toán cùng Eliza Tâm Dương</p>
+    </footer>
+
+    <script>
+        const STAGES = ["Nhận diện góc", "Thám tử dấu", "Kết nối giá trị", "Mở khóa lượng giác"];
+        const FRAC = (tu, mau) => `<span class="frac"><span>${tu}</span><span>${mau}</span></span>`;
+        const SQRT = (num) => `&radic;${num}`;
+        const ALPHA = `<span class="math-normal">α</span>`;
+
+        const QUESTION_BANK = [
+            {
+                id: 1, stage: 0, type: "mcq", graphReq: { angle: null, desc: "generic" },
+                q: `Trên nửa đường tròn đơn vị, điểm <span class="math-normal">M(x; y)</span> ứng với góc ${ALPHA}. Khẳng định nào đúng?`,
+                opts: [
+                    `<span class="math-normal">sin${ALPHA} = x, cos${ALPHA} = y</span>.`,
+                    `<span class="math-normal">sin${ALPHA} = y, cos${ALPHA} = x</span>.`,
+                    `<span class="math-normal">sin${ALPHA} = x/y, cos${ALPHA} = y/x</span>.`,
+                    `<span class="math-normal">sin${ALPHA} = -y, cos${ALPHA} = -x</span>.`
+                ],
+                ans: `<span class="math-normal">sin${ALPHA} = y, cos${ALPHA} = x</span>.`,
+                exp: `Sin là tung độ (y), cos là hoành độ (x) của điểm M trên nửa đường tròn đơn vị.`
+            },
+            {
+                id: 2, stage: 0, type: "mcq",
+                q: `Giá trị của <span class="math-normal">sin 30°</span> là:`,
+                opts: [ `${FRAC(SQRT(3), 2)}.`, `${FRAC(SQRT(2), 2)}.`, `${FRAC(1, 2)}.`, `1.` ],
+                ans: `${FRAC(1, 2)}.`,
+                exp: `sin 30° = 1/2 là giá trị lượng giác của góc đặc biệt.`
+            },
+            {
+                id: 3, stage: 0, type: "mcq", graphReq: { angle: 120, comp: 60 },
+                q: `Giá trị của <span class="math-normal">cos 120°</span> là:`,
+                opts: [ `-${FRAC(1, 2)}.`, `${FRAC(1, 2)}.`, `-${FRAC(SQRT(3), 2)}.`, `${FRAC(SQRT(3), 2)}.` ],
+                ans: `-${FRAC(1, 2)}.`,
+                exp: `120° và 60° bù nhau nên cos 120° = -cos 60° = -1/2.`
+            },
+            {
+                id: 4, stage: 0, type: "mcq", graphReq: { angle: 90 },
+                q: `Giá trị nào <strong>không xác định</strong>?`,
+                opts: [ `<span class="math-normal">sin 90°</span>.`, `<span class="math-normal">cos 90°</span>.`, `<span class="math-normal">cot 90°</span>.`, `<span class="math-normal">tan 90°</span>.` ],
+                ans: `<span class="math-normal">tan 90°</span>.`,
+                exp: `tan 90° = sin 90° / cos 90°, nhưng cos 90° = 0 nên phép chia không xác định.`
+            },
+            {
+                id: 5, stage: 0, type: "mcq", graphReq: { angle: 135 },
+                q: `Cho <span class="math-normal">90° < ${ALPHA} < 180°</span>. Khẳng định nào đúng?`,
+                opts: [
+                    `<span class="math-normal">sin${ALPHA} < 0, cos${ALPHA} > 0</span>.`,
+                    `<span class="math-normal">sin${ALPHA} > 0, cos${ALPHA} < 0</span>.`,
+                    `<span class="math-normal">sin${ALPHA} < 0, cos${ALPHA} < 0</span>.`,
+                    `<span class="math-normal">sin${ALPHA} > 0, cos${ALPHA} > 0</span>.`
+                ],
+                ans: `<span class="math-normal">sin${ALPHA} > 0, cos${ALPHA} < 0</span>.`,
+                exp: `Điểm M ứng với góc tù nằm ở góc phần tư thứ hai: tung độ dương (sin), hoành độ âm (cos).`
+            },
+            {
+                id: 6, stage: 1, type: "tf", graphReq: { angle: 150, comp: 30 },
+                q: `“<span class="math-normal">sin 150° = sin 30°</span>.”`,
+                ans: "Đúng", exp: `150° và 30° bù nhau nên có cùng giá trị sin (tung độ bằng nhau).`
+            },
+            {
+                id: 7, stage: 1, type: "tf", graphReq: { angle: 150, comp: 30 },
+                q: `“<span class="math-normal">cos 150° = cos 30°</span>.”`,
+                ans: "Sai", exp: `cos 150° = -cos 30° = -√3/2.`
+            },
+            {
+                id: 8, stage: 1, type: "tf",
+                q: `“<span class="math-normal">tan 135° = -1</span>.”`,
+                ans: "Đúng", exp: `tan 135° = -tan 45° = -1.`
+            },
+            {
+                id: 9, stage: 1, type: "tf",
+                q: `“<span class="math-normal">cot 0° = 0</span>.”`,
+                ans: "Sai", exp: `cot 0° = cos 0° / sin 0°, nhưng sin 0° = 0 nên cot 0° không xác định.`
+            },
+            {
+                id: 10, stage: 1, type: "tf",
+                q: `“<span class="math-normal">sin²${ALPHA} + cos²${ALPHA} = 1</span> với mọi <span class="math-normal">${ALPHA} ∈ [0°; 180°]</span>.”`,
+                ans: "Đúng", exp: `Điểm M(cos α; sin α) nằm trên đường tròn đơn vị bán kính R=1 nên x² + y² = 1.`
+            },
+            {
+                id: 11, stage: 2, type: "dnd", layout: "list", graphReq: { angle: "0-180" },
+                q: "Ghép biểu thức với giá trị lượng giác tương ứng.",
+                targets: [`<span class="math-normal">sin 0°</span>`, `<span class="math-normal">cos 0°</span>`, `<span class="math-normal">cos 180°</span>`],
+                items: ["0", "1", "-1"],
+                pairs: {
+                    `<span class="math-normal">sin 0°</span>`: "0",
+                    `<span class="math-normal">cos 0°</span>`: "1",
+                    `<span class="math-normal">cos 180°</span>`: "-1"
+                },
+                exp: `Tại 0°, M(1; 0); tại 180°, M(-1; 0). Hoành độ là cos, tung độ là sin.`
+            },
+            {
+                id: 12, stage: 2, type: "dnd", layout: "list", allowDupItem: true,
+                q: "Ghép biểu thức với giá trị của các góc đặc biệt.",
+                targets: [`<span class="math-normal">sin 45°</span>`, `<span class="math-normal">cos 60°</span>`, `<span class="math-normal">tan 60°</span>`, `<span class="math-normal">cot 30°</span>`],
+                items: [FRAC(SQRT(2),2), FRAC(1,2), SQRT(3), SQRT(3)],
+                pairs: {
+                    `<span class="math-normal">sin 45°</span>`: FRAC(SQRT(2),2),
+                    `<span class="math-normal">cos 60°</span>`: FRAC(1,2),
+                    `<span class="math-normal">tan 60°</span>`: SQRT(3),
+                    `<span class="math-normal">cot 30°</span>`: SQRT(3)
+                },
+                exp: `Bảng giá trị lượng giác góc đặc biệt. tan 60° = cot 30° = √3.`
+            },
+            {
+                id: 13, stage: 2, type: "dnd", layout: "list", graphReq: { angle: "120-135-150" },
+                q: "Ghép biểu thức với giá trị lượng giác của các góc tù.",
+                targets: [`<span class="math-normal">sin 150°</span>`, `<span class="math-normal">cos 120°</span>`, `<span class="math-normal">tan 135°</span>`, `<span class="math-normal">cot 120°</span>`],
+                items: [FRAC(1,2), `-${FRAC(1,2)}`, "-1", `-${FRAC(SQRT(3),3)}`],
+                pairs: {
+                    `<span class="math-normal">sin 150°</span>`: FRAC(1,2),
+                    `<span class="math-normal">cos 120°</span>`: `-${FRAC(1,2)}`,
+                    `<span class="math-normal">tan 135°</span>`: "-1",
+                    `<span class="math-normal">cot 120°</span>`: `-${FRAC(SQRT(3),3)}`
+                },
+                exp: `Dùng góc bù với 30°, 60° hoặc 45°; sin giữ nguyên dương, cos/tan/cot lấy giá trị âm.`
+            },
+            {
+                id: 14, stage: 2, type: "dnd-group",
+                q: `Với <span class="math-normal">90° < ${ALPHA} < 180°</span>, kéo các biểu thức lượng giác vào nhóm nhận dấu tương ứng.`,
+                targets: ["Nhóm Dương (> 0)", "Nhóm Âm (< 0)"],
+                slotsPerGroup: { "Nhóm Dương (> 0)": 1, "Nhóm Âm (< 0)": 3 },
+                items: [`<span class="math-normal">sin${ALPHA}</span>`, `<span class="math-normal">cos${ALPHA}</span>`, `<span class="math-normal">tan${ALPHA}</span>`, `<span class="math-normal">cot${ALPHA}</span>`],
+                correctGroups: {
+                    "Nhóm Dương (> 0)": [`<span class="math-normal">sin${ALPHA}</span>`],
+                    "Nhóm Âm (< 0)": [`<span class="math-normal">cos${ALPHA}</span>`, `<span class="math-normal">tan${ALPHA}</span>`, `<span class="math-normal">cot${ALPHA}</span>`]
+                },
+                exp: `Góc tù có sin dương, còn cos, tan, cot đều âm.`
+            },
+            {
+                id: 15, stage: 2, type: "dnd", layout: "list",
+                q: `Ghép biểu thức của hai góc bù nhau (xét khi xác định).`,
+                targets: [`<span class="math-normal">sin(180° - ${ALPHA})</span>`, `<span class="math-normal">cos(180° - ${ALPHA})</span>`, `<span class="math-normal">tan(180° - ${ALPHA})</span>`, `<span class="math-normal">cot(180° - ${ALPHA})</span>`],
+                items: [`<span class="math-normal">sin${ALPHA}</span>`, `<span class="math-normal">-cos${ALPHA}</span>`, `<span class="math-normal">-tan${ALPHA}</span>`, `<span class="math-normal">-cot${ALPHA}</span>`],
+                pairs: {
+                    `<span class="math-normal">sin(180° - ${ALPHA})</span>`: `<span class="math-normal">sin${ALPHA}</span>`,
+                    `<span class="math-normal">cos(180° - ${ALPHA})</span>`: `<span class="math-normal">-cos${ALPHA}</span>`,
+                    `<span class="math-normal">tan(180° - ${ALPHA})</span>`: `<span class="math-normal">-tan${ALPHA}</span>`,
+                    `<span class="math-normal">cot(180° - ${ALPHA})</span>`: `<span class="math-normal">-cot${ALPHA}</span>`
+                },
+                exp: `Hai góc bù nhau có sin bằng nhau; cos, tan, cot thì đối nhau.`
+            },
+            {
+                id: 16, stage: 3, type: "fill", graphReq: { angle: 90 },
+                q: `Điền giá trị: <span class="math-normal">sin 90°</span> = [INPUT]`,
+                ansNorms: ["1", "1.0", "+1"], dispAns: "1",
+                exp: `Tại 90°, M(0; 1), sin 90° = 1.`
+            },
+            {
+                id: 17, stage: 3, type: "fill", graphReq: { angle: 180 },
+                q: `Điền giá trị: <span class="math-normal">cos 180°</span> = [INPUT]`,
+                ansNorms: ["-1", "-1.0"], dispAns: "-1",
+                exp: `Tại 180°, M(-1; 0), cos 180° = -1.`
+            },
+            {
+                id: 18, stage: 3, type: "fill",
+                q: `Điền số nguyên vào chỗ trống:<br><span class="math-normal">sin 120° = ${SQRT(3)} /</span> [INPUT]`,
+                ansNorms: ["2"], dispAns: "2",
+                exp: `sin 120° = sin 60° = √3 / 2.`
+            },
+            {
+                id: 19, stage: 3, type: "fill",
+                q: `Cho <span class="math-normal">90° < ${ALPHA} < 180°</span> và <span class="math-normal">sin${ALPHA} = ${FRAC(3, 5)}</span>. Điền số nguyên vào tử số:<br><span class="math-normal">cos${ALPHA} = </span> ${FRAC("[INPUT]", "5")}`,
+                ansNorms: ["-4"], dispAns: "-4",
+                exp: `cos α = -4/5 vì góc tù có cos âm.`
+            },
+            {
+                id: 20, stage: 3, type: "fill",
+                q: `Cho <span class="math-normal">90° < ${ALPHA} < 180°</span> và <span class="math-normal">cos${ALPHA} = ${FRAC("-3", 5)}</span>. Điền số nguyên vào tử số:<br><span class="math-normal">tan${ALPHA} = </span> ${FRAC("[INPUT]", "3")}`,
+                ansNorms: ["-4"], dispAns: "-4",
+                exp: `sin α = 4/5, tan α = sin α / cos α = -4/3.`
+            }
+        ];
+
+        let state = {
+            qIdx: 0, score: 0, stageScores: [0, 0, 0, 0], perfects: 0,
+            timer: null, timeRem: 0, isTimed: false, locked: false,
+            mistakes: [], isReview: false, revList: [], revIdx: 0, name: "Ẩn danh"
+        };
+
+        let dndState = { selected: null };
+
+        const DOM = {
+            screens: {
+                start: document.getElementById('screen-start'),
+                game: document.getElementById('screen-game'),
+                stage: document.getElementById('screen-stage'),
+                final: document.getElementById('screen-final'),
+                explore: document.getElementById('screen-explore')
+            },
+            header: document.getElementById('game-header'),
+            nameIn: document.getElementById('input-name'),
+            qText: document.getElementById('question-text'),
+            qIdxLbl: document.getElementById('q-idx-label'),
+            ansArea: document.getElementById('answer-area'),
+            fb: document.getElementById('feedback-area'),
+            fbTitle: document.getElementById('fb-title'),
+            fbAns: document.getElementById('fb-ans'),
+            fbExp: document.getElementById('fb-exp'),
+            fbGraph: document.getElementById('fb-graph-container'),
+            svgWrap: document.getElementById('svg-wrapper'),
+            btnStart: document.getElementById('btn-start'),
+            btnCheck: document.getElementById('btn-check'),
+            btnNext: document.getElementById('btn-next'),
+            btnNextStage: document.getElementById('btn-next-stage'),
+            btnResetDnd: document.getElementById('btn-reset-dnd'),
+            btnReview: document.getElementById('btn-review'),
+            btnExplore: document.getElementById('btn-explore'),
+            btnRestart: document.getElementById('btn-restart'),
+            btnCloseExplore: document.getElementById('btn-close-explore'),
+            displays: {
+                name: document.getElementById('player-display'),
+                stage: document.getElementById('stage-display'),
+                timer: document.getElementById('timer-display'),
+                timeVal: document.getElementById('time-val'),
+                score: document.getElementById('score-display'),
+                prog: document.getElementById('progress-bar'),
+                qNum: document.getElementById('q-num-display')
+            }
+        };
+
+        const utils = {
+            hideAll: () => Object.values(DOM.screens).forEach(el => el.classList.add('hidden')),
+            shuffle: (arr) => [...arr].sort(() => Math.random() - 0.5),
+            normNumStr: (s) => s.trim().toLowerCase().replace(/\s+/g, '').replace(/−/g, '-')
+        };
+
+        DOM.btnStart.onclick = () => {
+            let n = DOM.nameIn.value.trim();
+            if(n) state.name = n;
+            state.isTimed = document.querySelector('input[name="mode"]:checked').value === 'timed';
+            resetState(); startGame();
+        };
+
+        DOM.btnRestart.onclick = () => { resetState(); startGame(); };
+
+        function resetState() {
+            state.qIdx = 0; state.score = 0; state.stageScores = [0,0,0,0]; state.perfects = 0;
+            state.mistakes = []; state.isReview = false; state.locked = false;
+        }
+
+        function startGame() {
+            utils.hideAll();
+            DOM.header.classList.remove('hidden');
+            DOM.displays.name.textContent = state.name;
+            DOM.displays.timer.classList.toggle('hidden', !state.isTimed);
+            DOM.screens.game.classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function updateTopBar() {
+            DOM.displays.score.textContent = Math.round(state.score);
+            let qArr = state.isReview ? state.revList : QUESTION_BANK;
+            let cIdx = state.isReview ? state.revIdx : state.qIdx;
+            DOM.displays.prog.style.width = state.isReview ? '100%' : `${((cIdx) / 20) * 100}%`;
+            DOM.displays.stage.textContent = state.isReview ? "Ôn tập" : STAGES[qArr[cIdx].stage];
+            DOM.displays.qNum.textContent = cIdx + 1;
+            DOM.qIdxLbl.textContent = cIdx + 1;
+        }
+
+        function startTimer() {
+            stopTimer();
+            state.timeRem = 60;
+            DOM.displays.timeVal.textContent = `${state.timeRem}s`;
+            DOM.displays.timer.classList.remove('text-danger');
+            state.timer = setInterval(() => {
+                state.timeRem--;
+                DOM.displays.timeVal.textContent = `${state.timeRem}s`;
+                if(state.timeRem <= 10) DOM.displays.timer.classList.add('text-danger');
+                if(state.timeRem <= 0) { stopTimer(); checkAnswer(true); }
+            }, 1000);
+        }
+
+        function stopTimer() { if(state.timer) { clearInterval(state.timer); state.timer = null; } }
+
+        function renderQuestion() {
+            state.locked = false;
+            DOM.fb.classList.add('hidden');
+            DOM.fbGraph.classList.add('hidden');
+            DOM.btnCheck.classList.remove('hidden');
+            DOM.btnNext.classList.add('hidden');
+            DOM.btnResetDnd.classList.add('hidden');
+            dndState.selected = null;
+
+            let q = state.isReview ? state.revList[state.revIdx].q : QUESTION_BANK[state.qIdx];
+            updateTopBar();
+            
+            if (q.type === 'fill') {
+                let html = q.q.replace('[INPUT]', `<input type="text" class="inp-fill" autocomplete="off" inputmode="numeric">`);
+                DOM.qText.innerHTML = html;
+                DOM.ansArea.innerHTML = `<div class="text-center text-gray-400 italic text-sm mt-8">Chỉ nhập giá trị số nguyên hoặc phân số tương ứng.</div>`;
+                setTimeout(() => { let el = document.querySelector('.inp-fill'); if(el) el.focus(); }, 100);
+            } else {
+                DOM.qText.innerHTML = q.q;
+                if (q.type === 'mcq') {
+                    let opts = utils.shuffle(q.opts);
+                    let html = `<div class="flex flex-col gap-3 mt-4">`;
+                    opts.forEach(o => {
+                        let valEsc = o.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        html += `
+                        <label class="cursor-pointer">
+                            <input type="radio" name="mcq" value="${valEsc}" class="peer sr-only">
+                            <div class="p-4 rounded-xl border border-navy-lighter bg-navy-lighter peer-checked:border-teal peer-checked:bg-teal peer-checked:bg-opacity-10 transition-all flex gap-3 items-center hover:bg-gray-800 text-gray-200">
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-500 peer-checked:border-teal flex items-center justify-center shrink-0">
+                                    <div class="w-2.5 h-2.5 bg-teal rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                </div>
+                                <div class="flex-1">${o}</div>
+                            </div>
+                        </label>`;
+                    });
+                    DOM.ansArea.innerHTML = html + `</div>`;
+                } 
+                else if (q.type === 'tf') {
+                    DOM.ansArea.innerHTML = `
+                    <div class="flex gap-4 max-w-sm mx-auto mt-6">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tf" value="Đúng" class="peer sr-only">
+                            <div class="p-5 text-center text-xl font-bold rounded-xl border border-navy-lighter bg-navy-lighter peer-checked:border-success peer-checked:bg-success peer-checked:bg-opacity-20 peer-checked:text-success hover:bg-gray-800 transition-all">ĐÚNG</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tf" value="Sai" class="peer sr-only">
+                            <div class="p-5 text-center text-xl font-bold rounded-xl border border-navy-lighter bg-navy-lighter peer-checked:border-danger peer-checked:bg-danger peer-checked:bg-opacity-20 peer-checked:text-danger hover:bg-gray-800 transition-all">SAI</div>
+                        </label>
+                    </div>`;
+                }
+                else if (q.type.startsWith('dnd')) {
+                    DOM.btnResetDnd.classList.remove('hidden');
+                    let items = utils.shuffle([...q.items]);
+                    let html = `<div class="text-xs text-center text-gray-400 italic mb-4">Chạm chọn thẻ ở kho, sau đó chạm ô trống để thả.</div>`;
+                    
+                    if (q.layout === 'list') {
+                        html += `<div class="flex flex-col gap-3">`;
+                        q.targets.forEach(t => {
+                            let tgtEsc = t.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            html += `<div class="flex gap-2 items-stretch bg-navy p-2 rounded-lg border border-navy-lighter min-h-[50px]">
+                                        <div class="flex-1 flex items-center justify-center text-center text-sm text-gray-300 font-medium px-2">${t}</div>
+                                        <div class="flex items-center justify-center text-gray-500 font-bold px-1">➜</div>
+                                        <div class="dnd-slot w-1/3 min-w-[80px] border-2 border-dashed border-gray-600 rounded bg-navy-lighter bg-opacity-50 p-1 cursor-pointer flex items-center justify-center" data-tgt="${tgtEsc}"></div>
+                                     </div>`;
+                        });
+                        html += `</div>`;
+                    } else if (q.type === 'dnd-group') {
+                        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+                        q.targets.forEach(t => {
+                            let tgtEsc = t.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            html += `<div class="bg-navy p-3 rounded-lg border border-navy-lighter flex flex-col gap-3">
+                                        <div class="text-center font-semibold text-sm border-b border-gray-700 pb-2 ${t.includes('Dương') ? 'text-success' : 'text-danger'}">${t}</div>
+                                        <div class="flex flex-wrap gap-2 justify-center">`;
+                            for(let i=0; i<q.slotsPerGroup[t]; i++) html += `<div class="dnd-slot w-24 border-2 border-dashed border-gray-600 rounded bg-navy-lighter bg-opacity-50 p-2 min-h-[48px] cursor-pointer flex items-center justify-center" data-tgt="${tgtEsc}"></div>`;
+                            html += `</div></div>`;
+                        });
+                        html += `</div>`;
+                    }
+
+                    html += `
+                        <div class="mt-6 bg-navy-lighter p-4 rounded-xl border border-gray-700 shadow-inner">
+                            <div class="text-center text-xs font-bold text-gray-500 uppercase mb-3">Kho thẻ</div>
+                            <div class="flex flex-wrap gap-2 justify-center" id="dnd-pool">
+                                ${items.map((i, idx) => {
+                                    let valEsc = i.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    return `<div class="dnd-item bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded shadow text-sm md:text-base cursor-pointer border border-gray-600 text-center flex items-center justify-center min-w-[3rem]" data-val="${valEsc}" data-id="item-${idx}">${i}</div>`;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                    DOM.ansArea.innerHTML = html;
+                    initDND();
+                }
+            }
+
+            if (!state.isReview && state.isTimed) startTimer();
+        }
+
+        function initDND() {
+            const items = document.querySelectorAll('.dnd-item');
+            const slots = document.querySelectorAll('.dnd-slot');
+            const pool = document.getElementById('dnd-pool');
+
+            function clearSel() { if(dndState.selected) dndState.selected.classList.remove('selected'); dndState.selected = null; }
+
+            items.forEach(item => {
+                item.onclick = (e) => {
+                    if(state.locked) return; e.stopPropagation();
+                    if(dndState.selected === item) clearSel();
+                    else { clearSel(); dndState.selected = item; item.classList.add('selected'); }
+                };
+            });
+
+            slots.forEach(slot => {
+                slot.onclick = () => {
+                    if(state.locked || !dndState.selected) return;
+                    let sel = dndState.selected;
+                    if(slot.children.length > 0) {
+                        let ex = slot.children[0];
+                        sel.parentNode.appendChild(ex);
+                        slot.appendChild(sel);
+                    } else {
+                        slot.appendChild(sel);
+                    }
+                    clearSel();
+                };
+            });
+
+            pool.onclick = () => {
+                if(state.locked || !dndState.selected) return;
+                if(dndState.selected.parentNode !== pool) pool.appendChild(dndState.selected);
+                clearSel();
+            };
+
+            DOM.btnResetDnd.onclick = () => {
+                if(state.locked) return; clearSel();
+                document.querySelectorAll('.dnd-item').forEach(i => pool.appendChild(i));
+            };
+        }
+
+        DOM.btnCheck.onclick = () => checkAnswer(false);
+
+        function checkAnswer(isTimeout = false) {
+            if(state.locked) return;
+            let qArr = state.isReview ? state.revList : QUESTION_BANK;
+            let cIdx = state.isReview ? state.revIdx : state.qIdx;
+            let q = qArr[cIdx].q ? qArr[cIdx].q : qArr[cIdx];
+            if(state.isReview) q = qArr[cIdx].q;
+
+            let pts = 0, isFull = false;
+
+            if (q.type === 'mcq') {
+                let rd = document.querySelector('input[name="mcq"]:checked');
+                if(!rd && !isTimeout) { alert("Em hãy chọn một phương án!"); return; }
+                state.locked = true;
+                let ansEsc = q.ans.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                if(rd && rd.value === ansEsc) { pts = 10; isFull = true; }
+            } 
+            else if (q.type === 'tf') {
+                let rd = document.querySelector('input[name="tf"]:checked');
+                if(!rd && !isTimeout) { alert("Em hãy chọn Đúng hoặc Sai!"); return; }
+                state.locked = true;
+                if(rd && rd.value === q.ans) { pts = 10; isFull = true; }
+            }
+            else if (q.type === 'fill') {
+                let inp = document.querySelector('.inp-fill');
+                let val = utils.normNumStr(inp.value);
+                if(val === '' && !isTimeout) { alert("Em hãy điền vào chỗ trống!"); return; }
+                
+                state.locked = true; inp.disabled = true;
+                let isCorr = false;
+                for(let norm of q.ansNorms) {
+                    if (val === norm || Number(val) === Number(norm)) { isCorr = true; break; }
+                }
+
+                if(isCorr) {
+                    pts = 10; isFull = true;
+                    inp.classList.add('text-success', 'border-success'); inp.classList.remove('text-gold');
+                } else {
+                    inp.classList.add('text-danger', 'border-danger'); inp.classList.remove('text-gold');
+                }
+            }
+            else if (q.type.startsWith('dnd')) {
+                let slots = document.querySelectorAll('.dnd-slot');
+                let filled = Array.from(slots).filter(s => s.children.length > 0);
+                if(filled.length < slots.length && !isTimeout) { alert("Em hãy điền đủ thẻ vào các ô!"); return; }
+                state.locked = true; DOM.btnResetDnd.classList.add('hidden');
+                document.querySelectorAll('.dnd-item').forEach(i => i.style.pointerEvents = 'none');
+
+                let corr = 0;
+                let totalReq = q.type === 'dnd' ? q.targets.length : Object.keys(q.slotsPerGroup).reduce((a,k)=>a+q.slotsPerGroup[k],0);
+
+                if (q.type === 'dnd') {
+                    slots.forEach(s => {
+                        let tgtEsc = s.getAttribute('data-tgt');
+                        let tgtDec = tgtEsc.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        let expAnsDec = q.pairs[tgtDec];
+                        
+                        if(s.children.length > 0) {
+                            let valEsc = s.children[0].getAttribute('data-val');
+                            let valDec = valEsc.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                            let isMatch = (valDec === expAnsDec);
+
+                            if(isMatch) { corr++; s.classList.add('border-success', 'bg-success', 'bg-opacity-20'); }
+                            else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                        } else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                    });
+                } else if (q.type === 'dnd-group') {
+                    slots.forEach(s => {
+                        let grpEsc = s.getAttribute('data-tgt');
+                        let grpDec = grpEsc.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        
+                        if(s.children.length > 0) {
+                            let valEsc = s.children[0].getAttribute('data-val');
+                            let valDec = valEsc.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                            
+                            if(q.correctGroups[grpDec].includes(valDec)) { corr++; s.classList.add('border-success', 'bg-success', 'bg-opacity-20'); }
+                            else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                        } else s.classList.add('border-danger', 'bg-danger', 'bg-opacity-20');
+                    });
+                }
+                pts = (corr / totalReq) * 10;
+                if(corr === totalReq) isFull = true;
+            }
+
+            stopTimer();
+            if (!state.isReview) {
+                state.score += pts; state.stageScores[q.stage] += pts;
+                if(isFull) state.perfects++; else state.mistakes.push({q: q, pts: pts});
+                updateTopBar();
+            }
+            showFeedback(q, pts, isFull, isTimeout);
+        }
+
+        function showFeedback(q, pts, isFull, isTimeout) {
+            DOM.fb.classList.remove('hidden');
+            let cls = isFull ? 'bg-success bg-opacity-10 border-success' : (pts > 0 ? 'bg-gold bg-opacity-10 border-gold' : 'bg-danger bg-opacity-10 border-danger');
+            DOM.fb.className = `mb-6 p-4 rounded-xl border ${cls}`;
+            
+            let icon = isFull ? '🎉' : (pts > 0 ? '👍' : '💡');
+            let tText = isFull ? "Chính xác!" : (isTimeout ? "Hết giờ!" : "Em hãy xem lại...");
+            if(!state.isReview) tText += ` (+${Math.round(pts)} điểm)`;
+            else tText = isFull ? "🎉 Em nhớ bài rất tốt!" : "💡 Cần lưu ý hơn nhé!";
+            
+            DOM.fbTitle.innerHTML = `${icon} ${tText}`;
+            
+            let ansStr = "<strong>Đáp án đúng:</strong> ";
+            if(['mcq', 'tf'].includes(q.type)) ansStr += q.ans;
+            else if(q.type === 'fill') ansStr += `<span class="math-normal">${q.dispAns}</span>`;
+            else ansStr += "Xem giải thích hoặc cách xếp đúng bên trên.";
+            DOM.fbAns.innerHTML = ansStr;
+            DOM.fbExp.innerHTML = `<strong>Giải thích:</strong> ${q.exp}`;
+
+            if (q.graphReq) {
+                DOM.fbGraph.classList.remove('hidden');
+                renderSVGGraph(q.graphReq, DOM.svgWrap);
+            } else {
+                DOM.fbGraph.classList.add('hidden');
+            }
+
+            DOM.btnCheck.classList.add('hidden');
+            DOM.btnNext.classList.remove('hidden');
+            setTimeout(() => DOM.fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        }
+
+        function renderSVGGraph(req, container) {
+            const w = 300, h = 180;
+            const cx = 150, cy = 140, r = 100;
+            let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%">`;
+            svg += `
+                <line x1="20" y1="${cy}" x2="280" y2="${cy}" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <line x1="${cx}" y1="160" x2="${cx}" y2="20" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <text x="275" y="${cy + 15}" class="graph-label" font-style="italic">x</text>
+                <text x="${cx - 15}" y="25" class="graph-label" font-style="italic">y</text>
+                <text x="${cx - 12}" y="${cy + 15}" class="graph-label">O</text>
+                <text x="${cx + r - 5}" y="${cy + 15}" class="graph-label">1</text>
+                <text x="${cx - r - 15}" y="${cy + 15}" class="graph-label">-1</text>
+                <text x="${cx - 15}" y="${cy - r + 5}" class="graph-label">1</text>
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B" />
+                    </marker>
+                </defs>
+                <path d="M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="#94A3B8" stroke-width="2"/>
+            `;
+
+            if (req.angle !== null && req.angle !== "generic") {
+                let angles = typeof req.angle === 'string' ? req.angle.split('-').map(Number) : [req.angle];
+                angles.forEach(deg => {
+                    let rad = deg * Math.PI / 180;
+                    let mx = cx + r * Math.cos(rad);
+                    let my = cy - r * Math.sin(rad);
+                    svg += `<line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="#10B981" stroke-width="2"/>`;
+                    svg += `<circle cx="${mx}" cy="${my}" r="4" fill="#FBBF24"/>`;
+                    let arcR = 25;
+                    let arcX = cx + arcR * Math.cos(rad);
+                    let arcY = cy - arcR * Math.sin(rad);
+                    let largeArc = (deg > 180) ? 1 : 0; 
+                    if (deg > 0) {
+                        svg += `<path d="M ${cx + arcR} ${cy} A ${arcR} ${arcR} 0 ${largeArc} 0 ${arcX} ${arcY}" fill="none" stroke="#FBBF24" stroke-width="1.5"/>`;
+                        svg += `<text x="${cx + arcR * Math.cos(rad/2) + 5}" y="${cy - arcR * Math.sin(rad/2) - 5}" fill="#FBBF24" font-size="12">${deg}°</text>`;
+                    }
+                    svg += `<line x1="${mx}" y1="${my}" x2="${mx}" y2="${cy}" stroke="#64FFDA" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+                    svg += `<line x1="${mx}" y1="${my}" x2="${cx}" y2="${my}" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+                });
+            } else if (req.desc === "generic") {
+                let rad = 50 * Math.PI / 180;
+                let mx = cx + r * Math.cos(rad);
+                let my = cy - r * Math.sin(rad);
+                svg += `<line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="#10B981" stroke-width="2"/>`;
+                svg += `<circle cx="${mx}" cy="${my}" r="4" fill="#FBBF24"/>`;
+                svg += `<text x="${mx+5}" y="${my-5}" fill="#FBBF24" font-style="italic">M(x; y)</text>`;
+                svg += `<line x1="${mx}" y1="${my}" x2="${mx}" y2="${cy}" stroke="#64FFDA" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+                svg += `<line x1="${mx}" y1="${my}" x2="${cx}" y2="${my}" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+            }
+
+            svg += `</svg>`;
+            container.innerHTML = svg;
+        }
+
+        DOM.btnNext.onclick = () => {
+            if (state.isReview) {
+                state.revIdx++;
+                if (state.revIdx < state.revList.length) renderQuestion();
+                else showFinal();
+                return;
+            }
+
+            let cStg = QUESTION_BANK[state.qIdx].stage;
+            state.qIdx++;
+
+            if (state.qIdx < QUESTION_BANK.length) {
+                if (QUESTION_BANK[state.qIdx].stage !== cStg) {
+                    utils.hideAll(); DOM.screens.stage.classList.remove('hidden');
+                    document.getElementById('stage-name-summary').textContent = STAGES[cStg];
+                    document.getElementById('stage-score-summary').textContent = `${Math.round(state.stageScores[cStg])}/50`;
+                } else renderQuestion();
+            } else showFinal();
+        };
+
+        DOM.btnNextStage.onclick = () => {
+            utils.hideAll(); DOM.screens.game.classList.remove('hidden'); renderQuestion();
+        };
+
+        function showFinal() {
+            utils.hideAll();
+            DOM.header.classList.add('hidden');
+            DOM.screens.final.classList.remove('hidden');
+
+            document.getElementById('final-name').textContent = state.name;
+            document.getElementById('final-score').textContent = `${Math.round(state.score)} / 200`;
+            document.getElementById('final-perfect').textContent = `${state.perfects} / 20`;
+
+            let bd = "";
+            STAGES.forEach((s, i) => bd += `<div class="flex justify-between border-b border-gray-700 py-2"><span class="text-gray-400">${s}</span><span class="text-gold font-bold">${Math.round(state.stageScores[i])}/50</span></div>`);
+            document.getElementById('final-breakdown').innerHTML = bd;
+
+            let adv = document.getElementById('final-advice');
+            if (state.mistakes.length > 0) {
+                adv.innerHTML = "💡 <strong>Nhận xét:</strong> Em hãy cẩn thận dấu của cos, tan, cot khi góc tù nhé. Nhớ kỹ 2 góc bù nhau thì sin bằng nhau, còn lại đối nhau.";
+                adv.classList.remove('hidden');
+                document.getElementById('review-container').classList.remove('hidden');
+                DOM.btnReview.classList.remove('hidden');
+                
+                let rl = "";
+                state.mistakes.forEach(m => rl += `<div class="bg-navy p-3 rounded-lg border border-gray-700 text-gray-300 text-sm border-l-4 border-gold"><strong>Câu ${m.q.id}:</strong> ${m.q.q.replace(/<input[^>]*>/, '___')}</div>`);
+                document.getElementById('review-list').innerHTML = rl;
+            } else {
+                adv.innerHTML = "🏆 <strong>Tuyệt vời!</strong> Em đã làm chủ hoàn toàn vòng tròn lượng giác nửa trên!";
+                adv.classList.remove('hidden');
+                document.getElementById('review-container').classList.add('hidden');
+                DOM.btnReview.classList.add('hidden');
+            }
+        }
+
+        DOM.btnReview.onclick = () => {
+            state.isReview = true; state.revList = [...state.mistakes]; state.revIdx = 0;
+            utils.hideAll(); DOM.header.classList.remove('hidden'); DOM.screens.game.classList.remove('hidden');
+            DOM.displays.timer.classList.add('hidden'); renderQuestion();
+        };
+
+        DOM.btnExplore.onclick = () => {
+            utils.hideAll(); DOM.screens.explore.classList.remove('hidden');
+            initExplore();
+        };
+
+        DOM.btnCloseExplore.onclick = () => {
+            utils.hideAll(); DOM.screens.final.classList.remove('hidden');
+        };
+
+        function initExplore() {
+            const slider = document.getElementById('explore-slider');
+            const lbl = document.getElementById('explore-angle-val');
+            const wrap = document.getElementById('explore-svg-wrapper');
+            const vSin = document.getElementById('val-sin');
+            const vCos = document.getElementById('val-cos');
+            const vTan = document.getElementById('val-tan');
+            const vCot = document.getElementById('val-cot');
+
+            function update(deg) {
+                lbl.textContent = `${deg}°`;
+                let rad = deg * Math.PI / 180;
+                let sinVal = Math.sin(rad);
+                let cosVal = Math.cos(rad);
+                if(Math.abs(sinVal) < 1e-10) sinVal = 0;
+                if(Math.abs(cosVal) < 1e-10) cosVal = 0;
+
+                vSin.textContent = sinVal.toFixed(3);
+                vCos.textContent = cosVal.toFixed(3);
+
+                if (deg === 90) {
+                    vTan.innerHTML = `<span class="text-danger text-xs">Không xác định</span>`;
+                    vCot.textContent = "0.000";
+                } else if (deg === 0 || deg === 180) {
+                    vTan.textContent = "0.000";
+                    vCot.innerHTML = `<span class="text-danger text-xs">Không xác định</span>`;
+                } else {
+                    vTan.textContent = (sinVal / cosVal).toFixed(3);
+                    vCot.textContent = (cosVal / sinVal).toFixed(3);
+                }
+
+                renderSVGGraph({ angle: parseInt(deg) }, wrap);
+            }
+
+            slider.oninput = (e) => update(e.target.value);
+            update(slider.value);
+        }
+    </script>
+</body>
+</html>

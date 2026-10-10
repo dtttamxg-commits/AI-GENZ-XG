@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chinh Phục Vương Quốc Tập Hợp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0A192F',
+                        'navy-light': '#112240',
+                        'navy-lighter': '#233554',
+                        teal: '#64FFDA',
+                        gold: '#FBBF24',
+                        danger: '#EF4444',
+                        success: '#10B981'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0A192F; color: #E2E8F0; overscroll-behavior-y: none; }
+        .dnd-item.selected { border-color: #FBBF24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); transform: scale(1.05); z-index: 10; }
+        .dnd-dropzone.active { border-color: #64FFDA; background-color: rgba(100, 255, 218, 0.1); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .math { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; letter-spacing: 0.5px; font-style: italic; }
+        .math-normal { font-family: 'Times New Roman', Times, serif; font-size: 1.15em; font-style: normal; }
+        .svg-draw { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 2s ease forwards; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen font-sans antialiased selection:bg-teal selection:text-navy">
+    <header class="bg-navy-light shadow-md border-b border-navy-lighter p-3 md:p-4 sticky top-0 z-10 hidden" id="game-header">
+        <div class="max-w-4xl mx-auto flex justify-between items-center text-sm md:text-base">
+            <div class="flex items-center gap-2 md:gap-3">
+                <span id="player-display-name" class="font-bold text-teal truncate max-w-[100px] md:max-w-[200px]">Người chơi</span>
+                <span id="stage-name-display" class="font-semibold text-gold bg-navy-lighter px-2 py-1 md:px-3 rounded-full text-xs md:text-sm">Chặng 1</span>
+            </div>
+            <div class="flex items-center gap-3 md:gap-4">
+                <div id="timer-display" class="font-mono text-lg md:text-xl font-bold text-teal hidden flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="timer-text">60s</span>
+                </div>
+                <div class="font-bold">Điểm: <span id="score-display" class="text-gold text-lg md:text-xl">0</span></div>
+            </div>
+        </div>
+        <div class="max-w-4xl mx-auto mt-2 md:mt-3 bg-navy-lighter h-1.5 md:h-2 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-teal to-gold h-full w-0 transition-all duration-300"></div>
+        </div>
+        <div class="max-w-4xl mx-auto text-xs text-gray-400 mt-1 text-right">
+            Câu <span id="question-number">1</span>/20
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-4xl mx-auto w-full relative">
+        <div id="screen-start" class="w-full max-w-md bg-navy-light p-6 md:p-8 rounded-2xl shadow-2xl border border-navy-lighter text-center fade-in mt-10 md:mt-0">
+            <div class="mb-6 flex justify-center">
+                <svg class="w-20 h-20 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal to-gold mb-3 leading-tight">
+                CHINH PHỤC VƯƠNG QUỐC TẬP HỢP
+            </h1>
+            <p class="text-gray-300 mb-6 text-sm md:text-base">Vận dụng tư duy logic và các phép toán tập hợp để vượt qua 4 chặng thử thách!</p>
+            <div class="space-y-5 text-left">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1" for="player-name">Tên người chơi / Đội</label>
+                    <input type="text" id="player-name" class="w-full bg-navy-lighter border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal transition-colors" placeholder="Nhập tên của bạn...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Thời gian trả lời</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="mode" value="normal" class="peer sr-only" checked>
+                            <div class="w-full text-center p-3 border border-gray-600 rounded-lg peer-checked:border-teal peer-checked:bg-teal peer-checked:bg-opacity-10 peer-checked:text-teal transition-all text-sm font-medium">Không giới hạn</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="mode" value="timed" class="peer sr-only">
+                            <div class="w-full text-center p-3 border border-gray-600 rounded-lg peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 peer-checked:text-gold transition-all text-sm font-medium">60s / Câu</div>
+                        </label>
+                    </div>
+                </div>
+                <button id="btn-start" class="w-full bg-gradient-to-r from-teal to-emerald-400 hover:from-teal hover:to-emerald-500 text-navy font-bold py-4 px-6 rounded-xl shadow-[0_0_15px_rgba(100,255,218,0.4)] transform transition active:scale-95 text-lg mt-4">
+                    BẮT ĐẦU NGAY
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-game" class="w-full hidden fade-in pb-16 pt-4 md:pt-8">
+            <div class="bg-navy-light rounded-2xl p-5 md:p-8 shadow-xl border border-navy-lighter relative">
+                <div id="question-text" class="text-lg md:text-xl font-medium mb-6 leading-relaxed">Nội dung câu hỏi</div>
+                <div id="answer-area" class="mb-8 min-h-[150px]"></div>
+                <div id="feedback-area" class="hidden mb-6 p-4 rounded-xl text-sm md:text-base border transition-all">
+                    <div id="feedback-title" class="font-bold text-lg mb-1"></div>
+                    <div id="feedback-correct-answer" class="text-gray-200 mb-3 italic"></div>
+                    <div id="feedback-explanation" class="text-gray-300"></div>
+                </div>
+                <div class="flex justify-end gap-3 md:gap-4 mt-6 border-t border-navy-lighter pt-5">
+                    <button id="btn-reset-dnd" class="hidden px-4 md:px-6 py-3 rounded-xl font-bold bg-navy-lighter text-gray-300 hover:bg-gray-700 transition-colors text-sm md:text-base">Xếp lại</button>
+                    <button id="btn-check" class="px-6 md:px-8 py-3 rounded-xl font-bold bg-teal hover:bg-emerald-400 text-navy transition-all shadow-md active:scale-95 text-sm md:text-base">Kiểm tra</button>
+                    <button id="btn-next" class="hidden px-6 md:px-8 py-3 rounded-xl font-bold bg-gold hover:bg-yellow-400 text-navy transition-all shadow-md active:scale-95 text-sm md:text-base">Câu tiếp theo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-stage-summary" class="w-full max-w-md text-center hidden fade-in mt-10 md:mt-0">
+            <div class="bg-navy-light p-8 rounded-2xl border border-navy-lighter shadow-2xl relative overflow-hidden">
+                <div class="text-teal mb-4 relative z-10">
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2 relative z-10">Hoàn thành chặng</h2>
+                <h3 id="summary-stage-name" class="text-xl text-gold mb-6 font-semibold relative z-10">Tên chặng</h3>
+                <div class="bg-navy-lighter p-5 rounded-xl mb-8 border border-gray-700 relative z-10">
+                    <p class="text-gray-400 mb-2 text-sm">Điểm chặng này</p>
+                    <p id="summary-stage-score" class="text-4xl font-bold text-teal">50 / 50</p>
+                </div>
+                <button id="btn-next-stage" class="w-full bg-teal text-navy font-bold py-3 px-6 rounded-xl hover:bg-emerald-400 transition-colors relative z-10 shadow-lg">Tiếp tục hành trình</button>
+            </div>
+        </div>
+
+        <div id="screen-final" class="w-full max-w-2xl hidden fade-in py-8">
+            <div class="bg-navy-light p-6 md:p-8 rounded-2xl border border-navy-lighter shadow-2xl relative overflow-hidden">
+                <div class="text-center mb-8 relative z-10">
+                    <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal to-gold mb-2">HOÀN THÀNH XUẤT SẮC!</h1>
+                    <p id="final-player-name" class="text-xl text-white font-semibold">Tên người chơi</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6 relative z-10">
+                    <div class="bg-navy-lighter p-4 rounded-xl text-center border border-gray-700 shadow-inner">
+                        <p class="text-sm text-gray-400 mb-1">Tổng điểm</p>
+                        <p id="final-score" class="text-3xl md:text-4xl font-bold text-gold">0 / 200</p>
+                    </div>
+                    <div class="bg-navy-lighter p-4 rounded-xl text-center border border-gray-700 shadow-inner">
+                        <p class="text-sm text-gray-400 mb-1">Số câu trọn vẹn</p>
+                        <p id="final-perfect" class="text-3xl md:text-4xl font-bold text-teal">0 / 20</p>
+                    </div>
+                </div>
+                <div class="mb-6 relative z-10 bg-navy-lighter p-4 rounded-xl border border-gray-700">
+                    <h3 class="text-base font-semibold mb-3 border-b border-gray-600 pb-2 text-gray-200">Điểm từng chặng</h3>
+                    <div id="final-stage-breakdown" class="space-y-2 text-sm md:text-base"></div>
+                </div>
+                <div id="final-advice" class="mb-6 text-center text-sm md:text-base text-gray-300 italic hidden"></div>
+                <div id="review-section" class="mb-8 hidden relative z-10">
+                    <h3 class="text-base font-semibold mb-3 text-danger flex items-center gap-2">Các câu cần xem lại</h3>
+                    <div id="review-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center mt-8 relative z-10">
+                    <button id="btn-review" class="hidden px-6 py-3 rounded-xl font-bold bg-navy text-white hover:bg-gray-800 transition-colors border border-gray-600 shadow-md">Ôn câu cần xem lại</button>
+                    <button id="btn-restart" class="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-teal to-emerald-400 text-navy hover:scale-105 transition-transform shadow-[0_0_15px_rgba(100,255,218,0.3)]">Chơi lại từ đầu</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="text-center py-4 text-xs md:text-sm text-gray-500 w-full mt-auto bg-navy-light border-t border-navy-lighter">
+        <p>Học Toán cùng Eliza Tâm Dương</p>
+    </footer>
+
+    <script>
+        const STAGES = [
+            "Cổng nhận diện — Trắc nghiệm",
+            "Thám tử tập hợp — Đúng/Sai",
+            "Cầu nối phép toán — Kéo thả",
+            "Kho báu kiến thức — Điền vào chỗ trống"
+        ];
+
+        const drawVennSVG = (setA, setB, highlight = 'none') => {
+            let fillA = highlight === 'A' || highlight === 'union' ? 'rgba(100,255,218,0.3)' : 'transparent';
+            let fillB = highlight === 'B' || highlight === 'union' ? 'rgba(251,191,36,0.3)' : 'transparent';
+            return `
+            <div class="mt-3 flex justify-center">
+                <svg width="200" height="120" viewBox="0 0 200 120" class="svg-draw">
+                    <circle cx="70" cy="60" r="50" fill="${fillA}" stroke="#64FFDA" stroke-width="2"/>
+                    <text x="40" y="30" fill="#64FFDA" font-weight="bold" font-family="sans-serif">A</text>
+                    <circle cx="130" cy="60" r="50" fill="${fillB}" stroke="#FBBF24" stroke-width="2"/>
+                    <text x="150" y="30" fill="#FBBF24" font-weight="bold" font-family="sans-serif">B</text>
+                </svg>
+            </div>`;
+        };
+
+        const drawNumberLine = (start, end, startType, endType) => {
+            let startMark = startType === '[' ? `<circle cx="50" cy="20" r="4" fill="#64FFDA" stroke="#64FFDA" stroke-width="2"/>` : 
+                            startType === '(' ? `<circle cx="50" cy="20" r="4" fill="#0A192F" stroke="#64FFDA" stroke-width="2"/>` : '';
+            let endMark = endType === ']' ? `<circle cx="250" cy="20" r="4" fill="#64FFDA" stroke="#64FFDA" stroke-width="2"/>` : 
+                          endType === ')' ? `<circle cx="250" cy="20" r="4" fill="#0A192F" stroke="#64FFDA" stroke-width="2"/>` : '';
+            return `
+            <div class="mt-3 flex justify-center overflow-x-auto">
+                <svg width="300" height="50" viewBox="0 0 300 50">
+                    <line x1="10" y1="20" x2="290" y2="20" stroke="#475569" stroke-width="2"/>
+                    <line x1="${startType==='inf'?10:50}" y1="20" x2="${endType==='inf'?290:250}" y2="20" stroke="#64FFDA" stroke-width="4" class="svg-draw"/>
+                    ${startMark} ${endMark}
+                    <text x="50" y="40" fill="#E2E8F0" font-size="12" text-anchor="middle" font-family="sans-serif">${start}</text>
+                    <text x="250" y="40" fill="#E2E8F0" font-size="12" text-anchor="middle" font-family="sans-serif">${end}</text>
+                </svg>
+            </div>`;
+        };
+
+        const QUESTION_BANK = [
+            {
+                id: 1, stage: 0, type: "mcq",
+                question: "Cho <span class='math'>A = {1; 2; 3; 4}</span>. Khẳng định nào đúng?",
+                options: ["<span class='math'>5 ∈ A</span>.", "<span class='math'>2 ∈ A</span>.", "<span class='math'>{2} ∈ A</span>.", "<span class='math'>3 ∉ A</span>."],
+                answer: "<span class='math'>2 ∈ A</span>.",
+                explanation: "Số 2 là một phần tử của A. Tập {2} là tập con của A, không phải phần tử của A."
+            },
+            {
+                id: 2, stage: 0, type: "mcq",
+                question: "Tập <span class='math'>B = {x ∈ ℤ | −2 < x ≤ 2}</span> được viết bằng cách liệt kê là:",
+                options: ["<span class='math'>{−2; −1; 0; 1; 2}</span>.", "<span class='math'>{−1; 0; 1}</span>.", "<span class='math'>{−1; 0; 1; 2}</span>.", "<span class='math'>{0; 1; 2}</span>."],
+                answer: "<span class='math'>{−1; 0; 1; 2}</span>.",
+                explanation: "Các số nguyên lớn hơn −2 và không vượt quá 2 là −1, 0, 1, 2."
+            },
+            {
+                id: 3, stage: 0, type: "mcq",
+                question: "Cho <span class='math'>A = {1; 2; 3}</span>, <span class='math'>B = {3; 4; 5}</span>. Tập <span class='math'>A ∩ B</span> là:",
+                options: ["<span class='math'>{1; 2; 3; 4; 5}</span>.", "<span class='math'>{1; 2}</span>.", "<span class='math'>{4; 5}</span>.", "<span class='math'>{3}</span>."],
+                answer: "<span class='math'>{3}</span>.",
+                explanation: "Giao gồm những phần tử thuộc cả hai tập hợp." + drawVennSVG('A', 'B', 'intersect')
+            },
+            {
+                id: 4, stage: 0, type: "mcq",
+                question: "Cho <span class='math'>A = {1; 2; 3}</span>, <span class='math'>B = {3; 4; 5}</span>. Tập <span class='math'>A ∪ B</span> là:",
+                options: ["<span class='math'>{1; 2; 3; 4; 5}</span>.", "<span class='math'>{3}</span>.", "<span class='math'>{1; 2; 4; 5}</span>.", "<span class='math'>{1; 2}</span>."],
+                answer: "<span class='math'>{1; 2; 3; 4; 5}</span>.",
+                explanation: "Hợp gồm những phần tử thuộc ít nhất một trong hai tập." + drawVennSVG('A', 'B', 'union')
+            },
+            {
+                id: 5, stage: 0, type: "mcq",
+                question: "Cho <span class='math'>A = [−1; 3]</span>, <span class='math'>B = (1; 5)</span>. Tập <span class='math'>A ∩ B</span> là:",
+                options: ["<span class='math'>[1; 3]</span>.", "<span class='math'>(1; 3]</span>.", "<span class='math'>(1; 3)</span>.", "<span class='math'>[−1; 5)</span>."],
+                answer: "<span class='math'>(1; 3]</span>.",
+                explanation: "Phần chung gồm các số lớn hơn 1 và không vượt quá 3." + drawNumberLine('1', '3', '(', ']')
+            },
+            {
+                id: 6, stage: 1, type: "tf",
+                question: "“<span class='math'>∅ ⊆ A</span> với mọi tập hợp <span class='math'>A</span>.”",
+                answer: "Đúng",
+                explanation: "Tập rỗng là tập con của mọi tập hợp."
+            },
+            {
+                id: 7, stage: 1, type: "tf",
+                question: "“Hai tập <span class='math'>{1; 2; 3}</span> và <span class='math'>{3; 1; 2}</span> bằng nhau.”",
+                answer: "Đúng",
+                explanation: "Hai tập có cùng các phần tử; thứ tự liệt kê không làm thay đổi tập hợp."
+            },
+            {
+                id: 8, stage: 1, type: "tf",
+                question: "“Với mọi tập <span class='math'>A, B</span>, ta luôn có <span class='math'>A ∖ B = B ∖ A</span>.”",
+                answer: "Sai",
+                explanation: "Chẳng hạn A = {1; 2}, B = {2; 3} thì A ∖ B = {1}, còn B ∖ A = {3}."
+            },
+            {
+                id: 9, stage: 1, type: "tf",
+                question: "“Nếu <span class='math'>A ⊆ B</span> thì <span class='math'>A ∩ B = A</span>.”",
+                answer: "Đúng",
+                explanation: "Mọi phần tử của A đều thuộc B nên phần chung chính là A."
+            },
+            {
+                id: 10, stage: 1, type: "tf",
+                question: "“<span class='math'>(−∞; 2] ∩ (2; +∞) = {2}</span>.”",
+                answer: "Sai",
+                explanation: "Tập thứ hai không chứa 2. Hai tập không có phần tử chung nên giao bằng ∅."
+            },
+            {
+                id: 11, stage: 2, type: "dnd",
+                question: "Ghép phép toán với ý nghĩa.",
+                targets: ["<span class='math'>A ∩ B</span>", "<span class='math'>A ∪ B</span>", "<span class='math'>A ∖ B</span>"],
+                items: ["Các phần tử thuộc cả A và B.", "Các phần tử thuộc A hoặc B, kể cả thuộc cả hai.", "Các phần tử thuộc A nhưng không thuộc B."],
+                pairs: {
+                    "<span class='math'>A ∩ B</span>": "Các phần tử thuộc cả A và B.",
+                    "<span class='math'>A ∪ B</span>": "Các phần tử thuộc A hoặc B, kể cả thuộc cả hai.",
+                    "<span class='math'>A ∖ B</span>": "Các phần tử thuộc A nhưng không thuộc B."
+                },
+                explanation: "Giao là phần chung, hợp là phần thuộc ít nhất một tập, hiệu phụ thuộc thứ tự hai tập."
+            },
+            {
+                id: 12, stage: 2, type: "dnd",
+                question: "Cho <span class='math'>A = {1; 2; 3; 4}</span>, <span class='math'>B = {3; 4; 5}</span>. Ghép phép toán với kết quả.",
+                targets: ["<span class='math'>A ∩ B</span>", "<span class='math'>A ∪ B</span>", "<span class='math'>A ∖ B</span>", "<span class='math'>B ∖ A</span>"],
+                items: ["<span class='math'>{3; 4}</span>.", "<span class='math'>{1; 2; 3; 4; 5}</span>.", "<span class='math'>{1; 2}</span>.", "<span class='math'>{5}</span>."],
+                pairs: {
+                    "<span class='math'>A ∩ B</span>": "<span class='math'>{3; 4}</span>.",
+                    "<span class='math'>A ∪ B</span>": "<span class='math'>{1; 2; 3; 4; 5}</span>.",
+                    "<span class='math'>A ∖ B</span>": "<span class='math'>{1; 2}</span>.",
+                    "<span class='math'>B ∖ A</span>": "<span class='math'>{5}</span>."
+                },
+                explanation: "Xác định phần chung trước, sau đó tìm phần riêng của từng tập."
+            },
+            {
+                id: 13, stage: 2, type: "dnd",
+                question: "Cho <span class='math'>A = {1; 2; 3}</span>, <span class='math'>B = {3; 4; 5}</span>. Đặt từng số vào vùng phù hợp.",
+                targets: ["Vùng chỉ thuộc A", "Vùng thuộc cả A và B", "Vùng chỉ thuộc B"],
+                items: ["1", "3", "5"],
+                pairs: {
+                    "Vùng chỉ thuộc A": "1",
+                    "Vùng thuộc cả A và B": "3",
+                    "Vùng chỉ thuộc B": "5"
+                },
+                explanation: "Số 3 thuộc giao; số 1 chỉ thuộc A; số 5 chỉ thuộc B."
+            },
+            {
+                id: 14, stage: 2, type: "dnd",
+                question: "Ghép tập hợp với điều kiện của <span class='math'>x ∈ ℝ</span>.",
+                targets: ["<span class='math'>[−2; 3]</span>", "<span class='math'>(−2; 3)</span>", "<span class='math'>[−2; 3)</span>", "<span class='math'>(−2; 3]</span>"],
+                items: ["<span class='math'>−2 ≤ x ≤ 3</span>.", "<span class='math'>−2 < x < 3</span>.", "<span class='math'>−2 ≤ x < 3</span>.", "<span class='math'>−2 < x ≤ 3</span>."],
+                pairs: {
+                    "<span class='math'>[−2; 3]</span>": "<span class='math'>−2 ≤ x ≤ 3</span>.",
+                    "<span class='math'>(−2; 3)</span>": "<span class='math'>−2 < x < 3</span>.",
+                    "<span class='math'>[−2; 3)</span>": "<span class='math'>−2 ≤ x < 3</span>.",
+                    "<span class='math'>(−2; 3]</span>": "<span class='math'>−2 < x ≤ 3</span>."
+                },
+                explanation: "Ngoặc vuông giữ đầu mút; ngoặc tròn loại đầu mút."
+            },
+            {
+                id: 15, stage: 2, type: "dnd-group",
+                question: "Cho tập xét <span class='math'>U = {1; 2; 3; 4; 5; 6}</span>, <span class='math'>A = {1; 3; 5}</span>. Kéo các số vào đúng nhóm.",
+                targets: ["Nhóm A", "Nhóm U ∖ A"],
+                slotsPerTarget: { "Nhóm A": 3, "Nhóm U ∖ A": 3 },
+                items: ["1", "2", "3", "4", "5", "6"],
+                correctGroups: {
+                    "Nhóm A": ["1", "3", "5"],
+                    "Nhóm U ∖ A": ["2", "4", "6"]
+                },
+                explanation: "Phần bù của A trong U gồm các phần tử thuộc U nhưng không thuộc A."
+            },
+            {
+                id: 16, stage: 3, type: "fill",
+                question: "Cho <span class='math'>A = {0; 1; 2}</span>, <span class='math'>B = {2; 3}</span>. Điền tập hợp: <span class='math'>A ∩ B = </span> <input type='text' class='fill-input inline-block w-24 border-b-2 border-gray-400 bg-transparent text-center text-gold focus:outline-none focus:border-teal font-serif text-lg' data-type='set' placeholder='{...}'>",
+                answerValidator: (val) => checkSet(val, ["2"]),
+                displayAnswer: "{2}",
+                explanation: "Phần tử chung duy nhất là 2."
+            },
+            {
+                id: 17, stage: 3, type: "fill",
+                question: "Cho <span class='math'>A = {1; 2; 3; 4}</span>, <span class='math'>B = {2; 4}</span>. Điền tập hợp: <span class='math'>A ∖ B = </span> <input type='text' class='fill-input inline-block w-32 border-b-2 border-gray-400 bg-transparent text-center text-gold focus:outline-none focus:border-teal font-serif text-lg' data-type='set' placeholder='{...}'>",
+                answerValidator: (val) => checkSet(val, ["1", "3"]),
+                displayAnswer: "{1; 3}",
+                explanation: "Loại khỏi A các phần tử 2 và 4 thuộc B."
+            },
+            {
+                id: 18, stage: 3, type: "fill",
+                question: "Tập các số thực <span class='math'>x</span> thỏa mãn <span class='math'>−1 ≤ x < 4</span> được viết bằng kí hiệu khoảng, đoạn hoặc nửa khoảng là <input type='text' class='fill-input inline-block w-28 border-b-2 border-gray-400 bg-transparent text-center text-gold focus:outline-none focus:border-teal font-serif text-lg' data-type='interval' placeholder='[a; b)'>.",
+                answerValidator: (val) => checkInterval(val, "[-1; 4)"),
+                displayAnswer: "[−1; 4)",
+                explanation: "Giữ đầu mút −1, loại đầu mút 4."
+            },
+            {
+                id: 19, stage: 3, type: "fill",
+                question: "Cho <span class='math'>A = [0; 4]</span>, <span class='math'>B = [2; 6]</span>. Điền tập hợp: <span class='math'>A ∪ B = </span> <input type='text' class='fill-input inline-block w-28 border-b-2 border-gray-400 bg-transparent text-center text-gold focus:outline-none focus:border-teal font-serif text-lg' data-type='interval' placeholder='[a; b]'>",
+                answerValidator: (val) => checkInterval(val, "[0; 6]"),
+                displayAnswer: "[0; 6]",
+                explanation: "Hai đoạn giao nhau và phủ kín đoạn từ 0 đến 6."
+            },
+            {
+                id: 20, stage: 3, type: "fill",
+                question: "Trong một lớp học, có 18 học sinh thích bóng đá, 15 học sinh thích cầu lông và 7 học sinh thích cả hai môn. Có <input type='text' class='fill-input inline-block w-16 border-b-2 border-gray-400 bg-transparent text-center text-gold focus:outline-none focus:border-teal font-bold text-lg' data-type='text'> học sinh thích ít nhất một trong hai môn.",
+                answerValidator: (val) => {
+                    let v = val.toLowerCase().trim();
+                    return v === "26" || v === "26 học sinh";
+                },
+                displayAnswer: "26",
+                explanation: "18 + 15 − 7 = 26. Trừ 7 vì những học sinh thích cả hai môn đã được tính hai lần."
+            }
+        ];
+
+        function checkSet(input, expectedArr) {
+            let s = input.trim();
+            if (!s.startsWith('{') || !s.endsWith('}')) return false;
+            s = s.slice(1, -1);
+            if (s.trim() === "" && expectedArr.length === 0) return true;
+            if (s.trim() === "" && expectedArr.length !== 0) return false;
+            let elements = s.split(/[,;]/).map(e => e.trim()).filter(e => e !== "");
+            let uniqueElements = [...new Set(elements)];
+            if (uniqueElements.length !== expectedArr.length) return false;
+            return uniqueElements.sort().every((val, index) => val === expectedArr.sort()[index]);
+        }
+
+        function checkInterval(input, expectedStr) {
+            let normInput = input.replace(/\s+/g, '').replace(/−/g, '-').replace(/,/g, ';');
+            let normExpected = expectedStr.replace(/\s+/g, '').replace(/−/g, '-').replace(/,/g, ';');
+            return normInput === normExpected;
+        }
+
+        let gameState = {
+            currentIndex: 0,
+            score: 0,
+            playerName: "Người chơi ẩn danh",
+            isTimed: false,
+            timeRemaining: 60,
+            timerInterval: null,
+            stageScores: [0, 0, 0, 0],
+            perfectQuestions: 0,
+            mistakes: [],
+            isAnswering: false, 
+            isReviewMode: false,
+            reviewList: [],
+            reviewIndex: 0
+        };
+
+        let dndState = { selectedItem: null };
+
+        const DOM = {
+            screens: {
+                start: document.getElementById('screen-start'),
+                game: document.getElementById('screen-game'),
+                stageSummary: document.getElementById('screen-stage-summary'),
+                final: document.getElementById('screen-final')
+            },
+            header: document.getElementById('game-header'),
+            btnStart: document.getElementById('btn-start'),
+            btnCheck: document.getElementById('btn-check'),
+            btnNext: document.getElementById('btn-next'),
+            btnNextStage: document.getElementById('btn-next-stage'),
+            btnResetDnd: document.getElementById('btn-reset-dnd'),
+            btnRestart: document.getElementById('btn-restart'),
+            btnReview: document.getElementById('btn-review'),
+            questionText: document.getElementById('question-text'),
+            answerArea: document.getElementById('answer-area'),
+            feedbackArea: document.getElementById('feedback-area'),
+            displays: {
+                playerName: document.getElementById('player-display-name'),
+                stageName: document.getElementById('stage-name-display'),
+                timer: document.getElementById('timer-display'),
+                timerText: document.getElementById('timer-text'),
+                score: document.getElementById('score-display'),
+                progress: document.getElementById('progress-bar'),
+                qNum: document.getElementById('question-number')
+            }
+        };
+
+        const utils = {
+            shuffle: (array) => {
+                let curr = array.length, rand;
+                while (curr != 0) {
+                    rand = Math.floor(Math.random() * curr);
+                    curr--;
+                    [array[curr], array[rand]] = [array[rand], array[curr]];
+                }
+                return array;
+            },
+            hideAllScreens: () => {
+                Object.values(DOM.screens).forEach(el => el.classList.add('hidden'));
+            }
+        };
+
+        DOM.btnStart.addEventListener('click', () => {
+            const nameInput = document.getElementById('player-name').value.trim();
+            if(nameInput) gameState.playerName = nameInput;
+            gameState.isTimed = document.querySelector('input[name="mode"]:checked').value === 'timed';
+            resetGameData();
+            startGame();
+        });
+
+        DOM.btnRestart.addEventListener('click', () => {
+            resetGameData();
+            startGame();
+        });
+
+        function resetGameData() {
+            gameState.currentIndex = 0;
+            gameState.score = 0;
+            gameState.stageScores = [0, 0, 0, 0];
+            gameState.perfectQuestions = 0;
+            gameState.mistakes = [];
+            gameState.isReviewMode = false;
+        }
+
+        function startGame() {
+            utils.hideAllScreens();
+            DOM.header.classList.remove('hidden');
+            DOM.screens.game.classList.remove('hidden');
+            DOM.displays.playerName.textContent = gameState.playerName;
+            if (gameState.isTimed) DOM.displays.timer.classList.remove('hidden');
+            else DOM.displays.timer.classList.add('hidden');
+            updateScoreDisplay();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            gameState.isAnswering = false;
+            let q;
+            if(gameState.isReviewMode) {
+                q = gameState.reviewList[gameState.reviewIndex].q;
+                DOM.displays.stageName.textContent = "Ôn Tập";
+                DOM.displays.qNum.textContent = `${gameState.reviewIndex + 1}/${gameState.reviewList.length}`;
+            } else {
+                q = QUESTION_BANK[gameState.currentIndex];
+                DOM.displays.stageName.textContent = STAGES[q.stage].split(' — ')[0];
+                DOM.displays.qNum.textContent = gameState.currentIndex + 1;
+                updateProgressBar();
+            }
+
+            DOM.questionText.innerHTML = `<span class="text-teal font-bold">Câu ${gameState.isReviewMode ? gameState.reviewIndex + 1 : gameState.currentIndex + 1}:</span> ${q.question}`;
+            DOM.answerArea.innerHTML = '';
+            DOM.feedbackArea.classList.add('hidden');
+            DOM.btnCheck.classList.remove('hidden');
+            DOM.btnNext.classList.add('hidden');
+            DOM.btnResetDnd.classList.add('hidden');
+            DOM.feedbackArea.className = "hidden mb-6 p-4 md:p-5 rounded-xl text-sm md:text-base border transition-all";
+
+            renderAnswerArea(q);
+            if (!gameState.isReviewMode && gameState.isTimed) {
+                startTimer();
+            }
+        }
+
+        function renderAnswerArea(q) {
+            if (q.type === 'mcq') {
+                let options = utils.shuffle([...q.options]);
+                let html = '<div class="space-y-3">';
+                options.forEach((opt) => {
+                    html += `
+                        <label class="block cursor-pointer">
+                            <input type="radio" name="q_mcq" value="${opt.replace(/"/g, '&quot;')}" class="peer sr-only">
+                            <div class="p-4 rounded-xl border border-navy-lighter bg-navy-lighter hover:bg-gray-800 peer-checked:border-teal peer-checked:bg-teal peer-checked:bg-opacity-10 peer-checked:text-teal transition-all flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-500 peer-checked:border-teal flex items-center justify-center flex-shrink-0">
+                                    <div class="w-3 h-3 rounded-full bg-teal opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                </div>
+                                <span class="flex-1 text-gray-200 peer-checked:text-white">${opt}</span>
+                            </div>
+                        </label>
+                    `;
+                });
+                html += '</div>';
+                DOM.answerArea.innerHTML = html;
+            } 
+            else if (q.type === 'tf') {
+                DOM.answerArea.innerHTML = `
+                    <div class="flex gap-4 max-w-sm mx-auto">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="q_tf" value="Đúng" class="peer sr-only">
+                            <div class="text-center py-5 px-4 rounded-xl border border-navy-lighter bg-navy-lighter hover:bg-gray-800 peer-checked:border-success peer-checked:bg-success peer-checked:bg-opacity-20 peer-checked:text-success transition-all text-xl font-bold shadow-sm">
+                                ĐÚNG
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="q_tf" value="Sai" class="peer sr-only">
+                            <div class="text-center py-5 px-4 rounded-xl border border-navy-lighter bg-navy-lighter hover:bg-gray-800 peer-checked:border-danger peer-checked:bg-danger peer-checked:bg-opacity-20 peer-checked:text-danger transition-all text-xl font-bold shadow-sm">
+                                SAI
+                            </div>
+                        </label>
+                    </div>
+                `;
+            }
+            else if (q.type === 'fill') {
+                DOM.answerArea.innerHTML = `<div class="text-sm md:text-base text-center py-6 text-gray-400 italic">Nhập câu trả lời của bạn vào chỗ trống phía trên. Chú ý các dấu ngoặc nếu là tập hợp hoặc khoảng/đoạn.</div>`;
+                setTimeout(() => {
+                    const firstInput = document.querySelector('.fill-input');
+                    if(firstInput) firstInput.focus();
+                }, 100);
+            }
+            else if (q.type === 'dnd' || q.type === 'dnd-group') {
+                DOM.btnResetDnd.classList.remove('hidden');
+                let items = utils.shuffle([...q.items]);
+                let html = `
+                    <div class="text-sm text-gray-400 mb-4 italic text-center flex items-center justify-center gap-2">
+                        Chạm để chọn thẻ dưới kho, sau đó chạm vào ô trống để xếp (có thể tráo đổi).
+                    </div>
+                    <div class="flex flex-col gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="drop-zones-container">
+                `;
+                
+                if (q.type === 'dnd') {
+                    q.targets.forEach((t) => {
+                        html += `
+                            <div class="bg-navy-lighter p-3 rounded-xl border border-gray-600 flex flex-col gap-2 shadow-inner">
+                                <div class="text-sm font-semibold text-teal border-b border-gray-700 pb-1">${t}</div>
+                                <div class="dnd-dropzone flex-1 border-2 border-dashed border-gray-500 rounded-lg flex items-center justify-center p-2 min-h-[48px] cursor-pointer hover:bg-gray-800 transition-colors" data-target="${t.replace(/"/g, '&quot;')}"></div>
+                            </div>
+                        `;
+                    });
+                } else if (q.type === 'dnd-group') {
+                    for (const [groupName, slots] of Object.entries(q.slotsPerTarget)) {
+                        html += `
+                            <div class="bg-navy-lighter p-3 rounded-xl border border-gray-600 flex flex-col gap-2 shadow-inner col-span-1">
+                                <div class="text-sm font-semibold text-teal border-b border-gray-700 pb-1 text-center">${groupName}</div>
+                                <div class="flex gap-2 justify-center" data-group="${groupName.replace(/"/g, '&quot;')}">
+                        `;
+                        for(let i=0; i<slots; i++) {
+                            html += `<div class="dnd-dropzone w-16 h-12 border-2 border-dashed border-gray-500 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors"></div>`;
+                        }
+                        html += `</div></div>`;
+                    }
+                }
+
+                html += `
+                        </div>
+                        <div class="bg-navy-lighter p-4 rounded-xl border border-gray-600 shadow-inner" id="dnd-pool">
+                            <div class="text-center text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider">Kho Thẻ</div>
+                            <div class="flex flex-wrap gap-2 justify-center">
+                                ${items.map(item => `
+                                    <div class="dnd-item bg-gradient-to-br from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 px-4 py-2 rounded-lg shadow-md cursor-pointer text-center text-sm md:text-base select-none border border-gray-500 transition-all text-white font-medium flex items-center justify-center min-w-[3rem]" data-value="${item.replace(/"/g, '&quot;')}">
+                                        ${item}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                DOM.answerArea.innerHTML = html;
+                initDragAndDropLogic();
+            }
+        }
+
+        function initDragAndDropLogic() {
+            const items = document.querySelectorAll('.dnd-item');
+            const dropzones = document.querySelectorAll('.dnd-dropzone');
+            const pool = document.querySelector('#dnd-pool .flex-wrap');
+            dndState.selectedItem = null;
+
+            function handleItemClick(e) {
+                if (gameState.isAnswering) return;
+                e.stopPropagation(); 
+                const item = e.currentTarget;
+                if (dndState.selectedItem === item) {
+                    item.classList.remove('selected');
+                    dndState.selectedItem = null;
+                    return;
+                }
+                if (dndState.selectedItem) {
+                    dndState.selectedItem.classList.remove('selected');
+                }
+                dndState.selectedItem = item;
+                item.classList.add('selected');
+            }
+
+            function handleZoneClick(e) {
+                if (gameState.isAnswering) return;
+                const zone = e.currentTarget;
+                if (dndState.selectedItem) {
+                    const item = dndState.selectedItem;
+                    const oldParent = item.parentElement;
+                    if (zone.children.length > 0) {
+                        const existingItem = zone.children[0];
+                        if (oldParent === pool) {
+                            pool.appendChild(existingItem);
+                            zone.appendChild(item);
+                        } else {
+                            oldParent.appendChild(existingItem);
+                            zone.appendChild(item);
+                        }
+                    } else {
+                        zone.appendChild(item);
+                    }
+                    item.classList.remove('selected');
+                    dndState.selectedItem = null;
+                } else if (zone.children.length > 0) {
+                    pool.appendChild(zone.children[0]);
+                }
+            }
+
+            document.getElementById('dnd-pool').addEventListener('click', () => {
+                if (gameState.isAnswering) return;
+                if (dndState.selectedItem && dndState.selectedItem.parentElement !== pool) {
+                    pool.appendChild(dndState.selectedItem);
+                    dndState.selectedItem.classList.remove('selected');
+                    dndState.selectedItem = null;
+                }
+            });
+
+            items.forEach(item => item.addEventListener('click', handleItemClick));
+            dropzones.forEach(zone => zone.addEventListener('click', handleZoneClick));
+
+            DOM.btnResetDnd.onclick = () => {
+                if (gameState.isAnswering) return;
+                document.querySelectorAll('.dnd-item').forEach(item => {
+                    item.classList.remove('selected');
+                    pool.appendChild(item);
+                });
+                dndState.selectedItem = null;
+            };
+        }
+
+        DOM.btnCheck.addEventListener('click', () => checkAnswer(false));
+
+        function checkAnswer(isTimeOut = false) {
+            if (gameState.isAnswering) return;
+            let q = gameState.isReviewMode ? gameState.reviewList[gameState.reviewIndex].q : QUESTION_BANK[gameState.currentIndex];
+            let isFullCorrect = false;
+            let scoreEarned = 0;
+            let msgTitle = "";
+            let msgClass = "";
+
+            if (q.type === 'mcq') {
+                const checked = document.querySelector('input[name="q_mcq"]:checked');
+                if (!checked && !isTimeOut) {
+                    showToast("Vui lòng chọn một đáp án!");
+                    return;
+                }
+                gameState.isAnswering = true;
+                if (checked && checked.value === q.answer) {
+                    isFullCorrect = true; scoreEarned = 10;
+                }
+            } 
+            else if (q.type === 'tf') {
+                const checked = document.querySelector('input[name="q_tf"]:checked');
+                if (!checked && !isTimeOut) {
+                    showToast("Vui lòng chọn Đúng hoặc Sai!");
+                    return;
+                }
+                gameState.isAnswering = true;
+                if (checked && checked.value === q.answer) {
+                    isFullCorrect = true; scoreEarned = 10;
+                }
+            }
+            else if (q.type === 'fill') {
+                const input = document.querySelector('.fill-input');
+                const userVal = input.value;
+                if (userVal.trim() === '' && !isTimeOut) {
+                    showToast("Vui lòng điền vào chỗ trống!");
+                    return;
+                }
+                gameState.isAnswering = true;
+                input.disabled = true;
+
+                if (q.answerValidator(userVal)) {
+                    isFullCorrect = true; 
+                    scoreEarned = 10;
+                    input.classList.add('text-success', 'border-success');
+                    input.classList.remove('text-gold');
+                } else {
+                    input.classList.add('text-danger', 'border-danger');
+                    input.classList.remove('text-gold');
+                }
+            }
+            else if (q.type === 'dnd' || q.type === 'dnd-group') {
+                const dropzones = document.querySelectorAll('.dnd-dropzone');
+                let filledZones = 0;
+                dropzones.forEach(z => { if(z.children.length > 0) filledZones++; });
+
+                if (filledZones < dropzones.length && !isTimeOut) {
+                    showToast("Vui lòng xếp đủ các thẻ vào vùng nhận!");
+                    return;
+                }
+                gameState.isAnswering = true;
+                let correctCount = 0;
+                let totalTargets = q.type === 'dnd' ? q.targets.length : Object.keys(q.slotsPerTarget).reduce((acc, curr) => acc + q.slotsPerTarget[curr], 0);
+
+                if (q.type === 'dnd') {
+                    dropzones.forEach(z => {
+                        const targetKey = z.getAttribute('data-target');
+                        if (z.children.length > 0) {
+                            const itemVal = z.children[0].getAttribute('data-value');
+                            if (q.pairs[targetKey] === itemVal) {
+                                correctCount++;
+                                styleDndItem(z, true);
+                            } else {
+                                styleDndItem(z, false);
+                            }
+                        } else {
+                            z.classList.add('border-danger', 'bg-danger', 'bg-opacity-10');
+                        }
+                    });
+                } else if (q.type === 'dnd-group') {
+                    dropzones.forEach(z => {
+                        const groupName = z.parentElement.getAttribute('data-group');
+                        if (z.children.length > 0) {
+                            const itemVal = z.children[0].getAttribute('data-value');
+                            if (q.correctGroups[groupName].includes(itemVal)) {
+                                correctCount++;
+                                styleDndItem(z, true);
+                            } else {
+                                styleDndItem(z, false);
+                            }
+                        } else {
+                            z.classList.add('border-danger', 'bg-danger', 'bg-opacity-10');
+                        }
+                    });
+                }
+
+                scoreEarned = (10 * correctCount) / totalTargets;
+                if (correctCount === totalTargets) isFullCorrect = true;
+                document.querySelectorAll('.dnd-item').forEach(i => i.style.pointerEvents = 'none');
+                document.getElementById('btn-reset-dnd').classList.add('hidden');
+            }
+
+            function styleDndItem(zone, isCorrect) {
+                if (isCorrect) {
+                    zone.classList.add('border-success', 'bg-success', 'bg-opacity-10');
+                    zone.children[0].classList.add('!border-success', '!text-success');
+                } else {
+                    zone.classList.add('border-danger', 'bg-danger', 'bg-opacity-10');
+                    zone.children[0].classList.add('!border-danger', '!text-red-300');
+                }
+            }
+
+            stopTimer();
+            if (!gameState.isReviewMode) {
+                gameState.score += scoreEarned;
+                gameState.stageScores[q.stage] += scoreEarned;
+                if (isFullCorrect) gameState.perfectQuestions++;
+                if (!isFullCorrect) {
+                    gameState.mistakes.push({ q: q, scoreEarned: scoreEarned });
+                }
+                updateScoreDisplay();
+            }
+
+            if (isFullCorrect) {
+                msgTitle = `🎉 Xuất sắc! (+${Math.round(scoreEarned)} điểm)`;
+                msgClass = "bg-success bg-opacity-20 border-success text-success";
+            } else if (scoreEarned > 0) {
+                msgTitle = `👍 Gần đúng! (+${scoreEarned.toFixed(1)} điểm)`;
+                msgClass = "bg-yellow-500 bg-opacity-20 border-yellow-500 text-yellow-300";
+            } else {
+                msgTitle = isTimeOut ? "⏰ Hết giờ! (0 điểm)" : "💡 Em hãy xem lại... (0 điểm)";
+                msgClass = "bg-danger bg-opacity-20 border-danger text-red-300";
+            }
+
+            if (gameState.isReviewMode) {
+                msgTitle = isFullCorrect ? "🎉 Chính xác!" : "💡 Hãy cố gắng ghi nhớ nhé!";
+            }
+
+            DOM.feedbackArea.classList.remove('hidden');
+            DOM.feedbackArea.classList.add(...msgClass.split(' '));
+            document.getElementById('feedback-title').innerHTML = msgTitle;
+            
+            let correctAnsHtml = "<strong>Đáp án đúng:</strong> ";
+            if (q.type === 'mcq' || q.type === 'tf') correctAnsHtml += q.answer;
+            else if (q.type === 'fill') correctAnsHtml += `<span class="math-normal">${q.displayAnswer}</span>`;
+            else if (q.type === 'dnd') {
+                correctAnsHtml = "<div class='mt-2 text-sm bg-navy px-3 py-2 rounded-lg border border-gray-700'>";
+                for (let [k, v] of Object.entries(q.pairs)) {
+                    correctAnsHtml += `<div class="mb-1"><span class="text-teal">${k}</span> ➔ <span>${v}</span></div>`;
+                }
+                correctAnsHtml += "</div>";
+            }
+            else if (q.type === 'dnd-group') {
+                 correctAnsHtml = "<div class='mt-2 text-sm bg-navy px-3 py-2 rounded-lg border border-gray-700 flex flex-wrap gap-4'>";
+                 for (let [k, v] of Object.entries(q.correctGroups)) {
+                     correctAnsHtml += `<div><span class="text-teal font-semibold">${k}:</span> ${v.join(', ')}</div>`;
+                 }
+                 correctAnsHtml += "</div>";
+            }
+            document.getElementById('feedback-correct-answer').innerHTML = correctAnsHtml;
+            document.getElementById('feedback-explanation').innerHTML = `<strong>Giải thích:</strong> ${q.explanation}`;
+
+            if (q.type === 'mcq' || q.type === 'tf') {
+                document.querySelectorAll(`input[type="radio"]`).forEach(r => r.disabled = true);
+            }
+
+            DOM.btnCheck.classList.add('hidden');
+            DOM.btnNext.classList.remove('hidden');
+            setTimeout(() => {
+                DOM.feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        DOM.btnNext.addEventListener('click', () => {
+            if (gameState.isReviewMode) {
+                gameState.reviewIndex++;
+                if (gameState.reviewIndex < gameState.reviewList.length) {
+                    loadQuestion();
+                } else {
+                    utils.hideAllScreens();
+                    DOM.screens.final.classList.remove('hidden');
+                }
+                return;
+            }
+
+            let currentStage = QUESTION_BANK[gameState.currentIndex].stage;
+            gameState.currentIndex++;
+
+            if (gameState.currentIndex < QUESTION_BANK.length) {
+                let nextStage = QUESTION_BANK[gameState.currentIndex].stage;
+                if (nextStage !== currentStage) {
+                    showStageSummary(currentStage);
+                } else {
+                    loadQuestion();
+                }
+            } else {
+                showFinalResults();
+            }
+        });
+
+        DOM.btnNextStage.addEventListener('click', () => {
+            utils.hideAllScreens();
+            DOM.screens.game.classList.remove('hidden');
+            loadQuestion();
+        });
+
+        function updateProgressBar() {
+            let percent = (gameState.currentIndex / QUESTION_BANK.length) * 100;
+            DOM.displays.progress.style.width = `${percent}%`;
+        }
+
+        function updateScoreDisplay() {
+            DOM.displays.score.textContent = Math.round(gameState.score);
+        }
+
+        function startTimer() {
+            stopTimer();
+            gameState.timeRemaining = 60;
+            DOM.displays.timerText.textContent = `${gameState.timeRemaining}s`;
+            DOM.displays.timer.classList.remove('text-danger');
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeRemaining--;
+                DOM.displays.timerText.textContent = `${gameState.timeRemaining}s`;
+                if (gameState.timeRemaining <= 10) {
+                    DOM.displays.timer.classList.add('text-danger');
+                }
+                if (gameState.timeRemaining <= 0) {
+                    stopTimer();
+                    checkAnswer(true); 
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl z-50 fade-in border border-gray-600 font-medium text-sm';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function showStageSummary(stageIndex) {
+            utils.hideAllScreens();
+            DOM.screens.stageSummary.classList.remove('hidden');
+            document.getElementById('summary-stage-name').textContent = STAGES[stageIndex];
+            document.getElementById('summary-stage-score').textContent = `${Math.round(gameState.stageScores[stageIndex])} / 50`;
+        }
+
+        function showFinalResults() {
+            utils.hideAllScreens();
+            DOM.header.classList.add('hidden');
+            DOM.screens.final.classList.remove('hidden');
+
+            document.getElementById('final-player-name').textContent = gameState.playerName;
+            document.getElementById('final-score').textContent = `${Math.round(gameState.score)} / 200`;
+            document.getElementById('final-perfect').textContent = `${gameState.perfectQuestions} / 20`;
+
+            let breakdownHtml = "";
+            STAGES.forEach((stageName, idx) => {
+                let sScore = Math.round(gameState.stageScores[idx]);
+                let colorClass = sScore === 50 ? 'text-teal' : (sScore >= 30 ? 'text-gold' : 'text-danger');
+                breakdownHtml += `
+                    <div class="flex justify-between border-b border-gray-700 py-2 items-center">
+                        <span class="text-gray-300 font-medium">${stageName.split(' — ')[0]}</span>
+                        <span class="font-bold ${colorClass} bg-navy px-3 py-1 rounded-lg">${sScore} / 50</span>
+                    </div>
+                `;
+            });
+            document.getElementById('final-stage-breakdown').innerHTML = breakdownHtml;
+
+            const minScore = Math.min(...gameState.stageScores);
+            const adviceEl = document.getElementById('final-advice');
+            if (minScore < 50) {
+                const weakStageIdx = gameState.stageScores.indexOf(minScore);
+                const adviceText = [
+                    "Em cần xem lại cách nhận diện phần tử và tập hợp con nhé.",
+                    "Chú ý hơn tính đúng/sai của các tính chất tập hợp.",
+                    "Luyện tập thêm về biểu diễn và tính toán giao, hợp, hiệu.",
+                    "Cần cẩn thận hơn với các khoảng, đoạn và dấu ngoặc vuông/tròn."
+                ][weakStageIdx];
+                adviceEl.textContent = `💡 Nhận xét: ${adviceText}`;
+                adviceEl.classList.remove('hidden');
+            } else {
+                adviceEl.textContent = "🏆 Tuyệt vời! Em đã nắm rất vững kiến thức tập hợp!";
+                adviceEl.classList.remove('hidden');
+            }
+
+            const reviewSec = document.getElementById('review-section');
+            const reviewList = document.getElementById('review-list');
+            const btnReview = document.getElementById('btn-review');
+
+            if (gameState.mistakes.length > 0) {
+                reviewSec.classList.remove('hidden');
+                btnReview.classList.remove('hidden');
+                let listHtml = "";
+                gameState.mistakes.forEach((m) => {
+                    let ansText = "";
+                    if (m.q.type === 'mcq' || m.q.type === 'tf') ansText = m.q.answer;
+                    else if (m.q.type === 'fill') ansText = m.q.displayAnswer;
+                    else ansText = "Xem giải thích chi tiết khi ôn tập";
+                    listHtml += `
+                        <div class="bg-navy p-3 rounded-lg border-l-4 border-gold shadow-sm">
+                            <p class="font-medium text-sm mb-1 text-gray-200">Câu ${m.q.id}: ${m.q.question.replace(/<input[^>]*>/, '___')}</p>
+                            <p class="text-xs text-teal">Đáp án đúng: <span class="math-normal">${ansText}</span></p>
+                        </div>
+                    `;
+                });
+                reviewList.innerHTML = listHtml;
+            } else {
+                reviewSec.classList.add('hidden');
+                btnReview.classList.add('hidden');
+            }
+        }
+
+        DOM.btnReview.addEventListener('click', () => {
+            if (gameState.mistakes.length === 0) return;
+            gameState.isReviewMode = true;
+            gameState.reviewList = [...gameState.mistakes];
+            gameState.reviewIndex = 0;
+            utils.hideAllScreens();
+            DOM.header.classList.remove('hidden');
+            DOM.screens.game.classList.remove('hidden');
+            DOM.displays.timer.classList.add('hidden'); 
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>

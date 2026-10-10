@@ -1,0 +1,158 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toán 10 – BÀI 3: Bất phương trình bậc nhất hai ẩn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>:root{--dam:#3730A3;--vua:#6366F1;--nhat:#EEF0FF;}
+@page { size: 210mm 297mm; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+html { background: #0b1120; min-height: 100%; }
+body { width: 100%; min-height: 100vh; margin: 0; padding: 12px 6px; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start; background: #0b1120; overflow-x: auto; overflow-y: auto; font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif; color: #1F2937; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 794px; min-height: 1123px; max-width: 100%; margin: 0 auto; display: flex; flex-direction: column; background: radial-gradient(circle at 100% 0%, var(--nhat) 0, transparent 38%), radial-gradient(circle at 0% 100%, var(--nhat) 0, transparent 30%), #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); overflow: visible; }
+.hd { position: relative; padding: 16px 26px 14px 26px; color: #fff; overflow: hidden;
+  background: linear-gradient(120deg, var(--dam) 0%, var(--vua) 100%); }
+.hd::after { content: ""; position: absolute; right: -60px; top: -70px; width: 230px; height: 230px; border-radius: 50%;
+  background: rgba(255,255,255,.10); }
+.hd .ch { padding-right: 200px; font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .92; }
+.hd .row { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.hd .so { flex: none; width: 64px; height: 64px; border-radius: 18px; background: #FFD43B; color: var(--dam);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800;
+  box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+.hd .so.ot { width: 84px; } .hd .so.ot b { font-size: 1.7rem; }
+.hd .so small { font-size: .7rem; font-weight: 700; line-height: 1; }
+.hd .so b { font-size: 2rem; line-height: 1; }
+.hd h1 { font-size: 1.95rem; line-height: 1.12; font-weight: 800; text-transform: uppercase; letter-spacing: .01em; }
+.hd .muc { margin-top: 8px; font-size: .9rem; background: rgba(255,255,255,.16); border-radius: 10px; padding: 5px 10px;
+  display: inline-block; position: relative; z-index: 1; }
+.hd .tag { position: absolute; right: 22px; top: 14px; font-size: .72rem; font-weight: 700; background: rgba(0,0,0,.18);
+  border-radius: 20px; padding: 3px 10px; z-index: 1; }
+.main { flex: 1; min-height: 0; padding: 14px 20px 6px 20px; display: flex; flex-direction: column; }
+.blk { display: flex; gap: 14px; align-items: flex-start; flex-shrink: 0; } .main > .card { flex-shrink: 0; } .col { flex: 1; min-width: 0; }
+.pool { display: none; }
+.card { break-inside: avoid; background: #fff; border-radius: 14px; margin-bottom: 12px; padding: 10px 12px 10px 12px;
+  border: 1.5px solid color-mix(in srgb, var(--vua) 35%, #fff); box-shadow: 0 2px 0 color-mix(in srgb, var(--vua) 25%, #fff); }
+.card.span { }
+.card h2 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; font-weight: 800; color: var(--dam); margin-bottom: 6px; }
+.card h2 .n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--dam); color: #fff; font-size: .78rem;
+  display: flex; align-items: center; justify-content: center; }
+.card h2 .ic { font-size: 1.15rem; }
+.card p, .card li { line-height: 1.45; }
+.card p + p { margin-top: 4px; }
+.card ul { padding-left: 16px; } .card li { margin: 2px 0; } .card li::marker { color: var(--vua); }
+.f { background: #FFF7D1; border-left: 4px solid #F5B700; border-radius: 8px; padding: 6px 10px; margin: 6px 0;
+  text-align: center; font-size: 1.04rem; }
+.f.l { text-align: left; }
+.k { color: var(--dam); font-weight: 700; }
+mark { background: #FFEB99; color: inherit; padding: 0 2px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.do { color: #DC2626; font-weight: 700; }
+.xanh { color: #15803D; font-weight: 700; }
+.nho { font-size: .86rem; color: #4B5563; }
+.vd { background: var(--nhat); border-radius: 8px; padding: 5px 9px; margin-top: 6px; font-size: .9rem; }
+.vd::before { content: "Ví dụ: "; font-weight: 700; color: var(--dam); }
+table.t { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: .92rem; }
+table.t th, table.t td { border: 1px solid color-mix(in srgb, var(--vua) 45%, #fff); padding: 3px 4px; text-align: center; }
+table.t th { background: var(--nhat); color: var(--dam); font-weight: 700; }
+.fig { text-align: center; margin: 4px 0; } .fig svg { max-width: 100%; height: auto; } svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.steps { counter-reset: s; list-style: none; padding-left: 0 !important; }
+.steps li { counter-increment: s; position: relative; padding-left: 26px; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 1px; width: 19px; height: 19px; border-radius: 6px;
+  background: var(--vua); color: #fff; font-size: .75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.mini { background: var(--nhat); border-radius: 8px; padding: 5px 7px; text-align: center; font-size: .9rem; }
+.mini b { display: block; color: var(--dam); font-size: .86rem; }
+.foot { padding: 0 20px 10px 20px; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bay, .meo { border-radius: 14px; padding: 9px 12px; font-size: .93rem; }
+.bay { background: #FFF1F1; border: 1.5px dashed #F87171; }
+.meo { background: #ECFDF3; border: 1.5px dashed #34D399; }
+.bay h3, .meo h3 { font-size: .98rem; font-weight: 800; margin-bottom: 4px; }
+.bay h3 { color: #B91C1C; } .meo h3 { color: #047857; }
+.bay ul, .meo ul { padding-left: 16px; } .bay li, .meo li { margin: 2px 0; line-height: 1.4; }
+.chot { margin-top: 10px; border-radius: 14px; padding: 9px 14px; color: #fff; font-weight: 700; font-size: 1.02rem;
+  background: linear-gradient(90deg, var(--dam), var(--vua)); display: flex; gap: 10px; align-items: center; }
+.chot .i { font-size: 1.4rem; }
+.ky { display: flex; justify-content: space-between; font-size: .7rem; color: #6B7280; margin-top: 6px; }
+.katex { font-size: 1.06em; }
+.sodo { display: flex; gap: 8px; align-items: stretch; }
+.sodo .goc { flex: none; width: 23%; border-radius: 12px; background: linear-gradient(160deg, var(--dam), var(--vua)); color: #fff;
+  display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; padding: 8px; font-size: 1.02rem; line-height: 1.25; }
+.sodo .ds { flex: 1; display: grid; gap: 7px; }
+.sodo .ls { border: 1.5px solid color-mix(in srgb, var(--vua) 45%, #fff); border-radius: 10px; overflow: hidden; background: #fff; }
+.sodo .ls > b { display: block; background: var(--nhat); color: var(--dam); padding: 3px 8px; font-size: .93rem; }
+.sodo .ls > .kw { display: block; padding: 3px 8px 4px; font-size: .9rem; line-height: 1.4; }
+.ck { list-style: none; padding-left: 0 !important; } .ck li { padding-left: 22px; position: relative; }
+.ck li::before { content: "☐"; position: absolute; left: 0; top: -1px; color: var(--dam); font-weight: 800; font-size: 1.05rem; }
+.dang td:first-child { text-align: left; font-weight: 600; } .dang td { text-align: left !important; }
+
+@media print {
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+  .page { box-shadow: none !important; border-radius: 0 !important; width: 794px !important; height: 1123px !important; }
+}
+</style></head><body>
+<div class="page">
+ <div class="hd"><div class="tag">TOÁN 10 · KẾT NỐI TRI THỨC</div>
+  <div class="ch">Chương II · Bất phương trình và hệ bất phương trình bậc nhất hai ẩn</div>
+  <div class="row"><div class="so"><small>BÀI</small><b>3</b></div><h1>Bất phương trình<br>bậc nhất hai ẩn</h1></div>
+  <div class="muc">🎯 Nhận biết BPT bậc nhất hai ẩn · kiểm tra nghiệm · biểu diễn miền nghiệm · giải bài toán thực tế</div></div>
+ <div class="main"></div><div class="pool"><div class="card"><h2><span class="n">1</span><span class="ic">📝</span>Dạng tổng quát</h2>
+<div class="f">$ax+by\le c\quad(\ \ge,\ &lt;,\ &gt;\ )$</div>
+<p>$a, b, c$ là số thực đã cho, <mark>$a$ và $b$ không đồng thời bằng 0</mark>; $x, y$ là ẩn.</p>
+<div class="grid2"><div class="mini"><b class="xanh">✔ Đúng dạng</b>$2x+3y&lt;1$</div><div class="mini"><b class="do">✘ Không phải</b>$2x^2+3y&lt;1$</div></div></div><div class="card"><h2><span class="n">2</span><span class="ic">🎯</span>Nghiệm của BPT</h2>
+<p>Cặp số $(x_0;y_0)$ là <span class="k">nghiệm</span> của $ax+by\le c$ nếu</p>
+<div class="f">$ax_0+by_0\le c$ đúng</div>
+<div class="vd">$x+2y&gt;5$: $(3;4)$ là nghiệm vì $3+8=11&gt;5$; $(0;-1)$ không là nghiệm vì $-2&lt;5$.</div>
+<p style="margin-top:5px">👉 BPT bậc nhất hai ẩn luôn có <b>vô số nghiệm</b>.</p></div><div class="card"><h2><span class="n">3</span><span class="ic">🗺️</span>Miền nghiệm là nửa mặt phẳng</h2>
+<p>Đường thẳng $d: ax+by=c$ chia mặt phẳng $Oxy$ thành hai nửa:</p>
+<ul><li>một nửa (không kể $d$) gồm các điểm có $ax+by&gt;c$;</li><li>nửa còn lại gồm các điểm có $ax+by&lt;c$;</li><li><b>bờ $d$</b>: các điểm có $ax+by=c$.</li></ul>
+<div class="fig"><svg viewBox="0 0 200 150" style="width:13em">
+<defs><pattern id="g3" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#94A3B8" stroke-width="1.4"/></pattern></defs>
+<polygon points="20,10 190,10 190,140" fill="url(#g3)"/><polygon points="10,10 20,10 190,140 10,140" fill="#C7D2FE" opacity=".55"/>
+<line x1="10" y1="100" x2="195" y2="100" stroke="#334155"/><line x1="70" y1="145" x2="70" y2="5" stroke="#334155"/>
+<line x1="20" y1="10" x2="190" y2="140" stroke="#DC2626" stroke-width="2.4"/>
+<circle cx="70" cy="100" r="3.5" fill="#111"/><text x="56" y="114" font-size="12" font-style="italic" font-family="Times New Roman">O</text>
+<text x="150" y="132" font-size="14" fill="#DC2626" font-weight="700" font-style="italic" font-family="Times New Roman">d</text>
+<text x="22" y="62" font-size="11" fill="#3730A3" font-weight="700" font-family="Be Vietnam Pro">MIỀN NGHIỆM</text>
+<text x="132" y="32" font-size="10" fill="#475569" font-family="Be Vietnam Pro">bị gạch bỏ</text></svg></div></div><div class="card"><h2><span class="n">4</span><span class="ic">🪜</span>4 bước vẽ miền nghiệm</h2>
+<ol class="steps"><li>Vẽ đường thẳng $d: ax+by=c$.</li>
+<li>Lấy điểm $M_0(x_0;y_0)\notin d$ <span class="nho">(thường lấy gốc $O$ khi $c\ne0$; khi $c=0$ lấy $(1;0)$ hoặc $(0;1)$)</span>.</li>
+<li>Tính $ax_0+by_0$ rồi so sánh với $c$.</li>
+<li><mark>$M_0$ thoả BPT → giữ nửa mặt phẳng chứa $M_0$</mark>; không thoả → giữ nửa kia. Gạch bỏ phần không là miền nghiệm.</li></ol>
+<div class="f l">✏️ Dấu $\le,\ \ge$: lấy cả bờ $d$ (nét liền)<br>✏️ Dấu $&lt;,\ &gt;$: bỏ bờ $d$ (vẽ <b>nét đứt</b>)</div></div><div class="card"><h2><span class="n">5</span><span class="ic">🎬</span>Ứng dụng thực tế</h2>
+<p>Rạp phim bán vé loại 1 giá 50 nghìn, loại 2 giá 100 nghìn; bán $x$ vé loại 1, $y$ vé loại 2. Rạp bị lỗ khi thu dưới 20 triệu:</p>
+<div class="f">$50x+100y&lt;20\,000 \iff x+2y&lt;400$</div>
+<p class="nho">Đặt ẩn → đổi đơn vị cho gọn → lập BPT → vẽ miền nghiệm để đọc kết quả.</p></div></div>
+ <div class="foot">
+  <div class="duo"><div class="bay"><h3>⚠️ Bẫy hay gặp</h3><ul><li>Có $x^2$, $xy$, $\frac1x$… thì <b>không</b> phải bậc nhất hai ẩn.</li><li>Quên vẽ bờ $d$ bằng <b>nét đứt</b> với dấu $&lt;, &gt;$.</li><li>Chọn điểm thử $M_0$ nằm ngay trên $d$ (VD: lấy $O$ khi $c=0$).</li><li>Gạch nhầm phía: nhớ <b>gạch phần bỏ đi</b>, phần sạch là miền nghiệm.</li></ul></div>
+  <div class="meo"><h3>💡 Mẹo nhớ nhanh</h3><ul><li><b>“Thử gốc O”</b>: đúng → giữ phía chứa O; sai → giữ phía bên kia.</li><li><b>Dấu bằng = nét liền</b>, không có dấu bằng = nét đứt.</li><li>Bài thực tế: nhớ thêm $x\ge0,\ y\ge0$ (số lượng không âm).</li></ul></div></div>
+  <div class="chot"><span class="i">⭐</span><span>Miền nghiệm của ax + by ≤ c là một nửa mặt phẳng bờ d – vẽ d, thử một điểm, gạch phần bỏ.</span></div>
+  <div class="ky"><span>Nguồn: SGK Toán 10 (KNTT), tập một, tr.22–25</span><span></span></div>
+ </div>
+</div>
+<script>
+document.fonts.ready.then(function(){
+ renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false});
+ var fs=13, pg=document.querySelector('.page'), m=document.querySelector('.main');
+ var cards=[].slice.call(document.querySelectorAll('.pool .card'));
+ function layout(){
+  m.innerHTML=''; var blk=null;
+  cards.forEach(function(c){
+   if(c.classList.contains('span')){ m.appendChild(c); blk=null; return; }
+   if(!blk){ blk=document.createElement('div'); blk.className='blk';
+     blk.innerHTML='<div class="col"></div><div class="col"></div>'; m.appendChild(blk); }
+   var a=blk.children[0], b=blk.children[1];
+   (a.offsetHeight<=b.offsetHeight?a:b).appendChild(c);
+  });
+ }
+ function over(){ layout(); return m.scrollHeight>m.clientHeight+1 || pg.scrollHeight>1125; }
+ function set(v){ fs=v; document.documentElement.style.fontSize=v+'px'; }
+ while(!over() && fs<17){ set(fs+0.25); }
+ while(over() && fs>10){ set(fs-0.25); }
+ set(fs-0.5); layout();
+ document.title += ' ['+fs+']';
+});
+</script></body></html>
