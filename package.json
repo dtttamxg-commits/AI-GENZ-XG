@@ -7,6 +7,7 @@
     "dev": "tsx dev-server.ts",
     "start": "tsx dev-server.ts",
     "build": "vite build",
+    "build:api": "node scripts/build-api.mjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
